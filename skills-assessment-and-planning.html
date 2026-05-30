@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Skills Assessment and Planning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7ab8d9;
+            --primary-light: #d4e8f0;
+            --primary-lighter: #f0f7fa;
+            --text-dark: #2c3e50;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --background: #f8f9fa;
+            --white: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        /* Edit Timeline Button */
+        .edit-timeline-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .edit-timeline-btn:hover {
+            background: #6aa7c8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(122, 184, 217, 0.4);
+        }
+
+        .edit-timeline-btn.show {
+            display: block;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .progress-line-active {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            height: 2px;
+            background: var(--primary);
+            z-index: 1;
+            transition: width 0.3s ease;
+        }
+
+        .progress-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .progress-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 2px solid var(--border);
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step:hover .progress-circle {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .progress-step.active .progress-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        .progress-step.completed .progress-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .progress-step.active .progress-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Section Card */
+        .section-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .section-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-medium);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Skills Assessment */
+        .skill-item {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .skill-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .skill-score {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .skill-description {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        /* Slider */
+        .slider-container {
+            margin-top: 16px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* Radar Chart */
+        .chart-container {
+            margin: 40px 0;
+            padding: 32px;
+            background: var(--primary-lighter);
+            border-radius: 12px;
+        }
+
+        /* Form Elements */
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-top: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            margin-top: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-size: 14px;
+            color: var(--text-dark);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #6aa7c8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(122, 184, 217, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Auto-save indicator */
+        .auto-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+        }
+
+        .auto-save.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hidden sections */
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .section-card {
+                padding: 24px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .edit-timeline-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="edit-timeline-btn" onclick="goToSection(3)">📝 Edit Timeline</button>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Module 1: Skills Assessment and Planning</h1>
+            <p>Understand where you are and create your personalized roadmap</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line"></div>
+                <div class="progress-line-active" id="progressLineActive"></div>
+                
+                <div class="progress-step active" data-section="1" onclick="goToSection(1)">
+                    <div class="progress-circle">1</div>
+                    <div class="progress-label">Skills</div>
+                </div>
+                
+                <div class="progress-step" data-section="2" onclick="goToSection(2)">
+                    <div class="progress-circle">2</div>
+                    <div class="progress-label">Reality Check</div>
+                </div>
+                
+                <div class="progress-step" data-section="3" onclick="goToSection(3)">
+                    <div class="progress-circle">3</div>
+                    <div class="progress-label">Timeline</div>
+                </div>
+                
+                <div class="progress-step" data-section="4" onclick="goToSection(4)">
+                    <div class="progress-circle">4</div>
+                    <div class="progress-label">Priorities</div>
+                </div>
+                
+                <div class="progress-step" data-section="5" onclick="goToSection(5)">
+                    <div class="progress-circle">5</div>
+                    <div class="progress-label">Summary</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Skills Assessment -->
+        <div id="section1" class="section-card active">
+            <h2 class="section-title">Rate Your Current Skills</h2>
+            <p class="section-subtitle">Before you assess yourself, here's the honest state of the market — and where you fit in it.</p>
+
+            <!-- Market Reality -->
+            <div style="background: var(--primary-lighter); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text-dark); margin-bottom: 16px;">🌊 The Market Right Now</h3>
+                
+                <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px; flex-shrink: 0;">✅</span>
+                        <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"><strong>Solo piano vocalist and guitar vocalist</strong> are the most consistently in-demand positions. Cruise lines are building new ships — overall demand is healthy.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px; flex-shrink: 0;">⚠️</span>
+                        <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"><strong>Duos and cocktail pianists</strong> (background, non-interactive) are oversupplied relative to available openings. These are harder to place.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px; flex-shrink: 0;">🌍</span>
+                        <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"><strong>The workforce has shifted.</strong> Filipino and South American musicians now dominate most ships. Western salaries are less competitive than they once were. You're not competing on price — you're competing on personality, range, and professionalism.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px; flex-shrink: 0;">🇫🇷</span>
+                        <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"><strong>French-speaking musicians are almost completely absent from the market</strong> — this is a real, underexploited opportunity if that's you.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <span style="font-size: 18px; flex-shrink: 0;">🎭</span>
+                        <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;"><strong>Production show performers</strong> (singers/dancers in cast shows) are an entirely different track with different requirements. This course is for solo lounge and bar entertainers only.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Position Targeting -->
+            <div style="background: var(--white); border: 2px solid var(--primary-light); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text-dark); margin-bottom: 8px;">🎯 Which Position Are You Training For?</h3>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 16px; line-height: 1.6;">
+                    This affects everything downstream — what agents look for, how they assess you, and what your roadmap should focus on. <strong>Piano bar entertainer</strong> and <strong>guitar vocalist</strong> are the most bookable. Both require the ability to host, interact with audiences, and run the room — not just play.
+                </p>
+                
+                <div style="display: grid; gap: 10px; margin-bottom: 16px;">
+                    <label style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;" id="pos-piano-label">
+                        <input type="radio" name="targetPosition" value="piano" onchange="selectPosition('piano')" style="margin-top: 2px; flex-shrink: 0;">
+                        <div>
+                            <p style="font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px;">🎹 Piano Bar Entertainer</p>
+                            <p style="font-size: 13px; color: var(--text-light);">Solo pianist-vocalist. Plays lounge/bar sets, takes requests, engages the audience. The most consistently in-demand solo position.</p>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;" id="pos-guitar-label">
+                        <input type="radio" name="targetPosition" value="guitar" onchange="selectPosition('guitar')" style="margin-top: 2px; flex-shrink: 0;">
+                        <div>
+                            <p style="font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px;">🎸 Guitar Vocalist</p>
+                            <p style="font-size: 13px; color: var(--text-light);">Solo guitarist-vocalist. Similar hosting expectations. Music reading ability is a genuine advantage here — makes you more hireable.</p>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s;" id="pos-unsure-label">
+                        <input type="radio" name="targetPosition" value="unsure" onchange="selectPosition('unsure')" style="margin-top: 2px; flex-shrink: 0;">
+                        <div>
+                            <p style="font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px;">🤔 Not Sure Yet</p>
+                            <p style="font-size: 13px; color: var(--text-light);">Complete this module — your skills assessment and reality check will help clarify which path suits you.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Readiness Check -->
+            <div style="background: #fff8ed; border: 2px solid #f0c060; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 17px; color: var(--text-dark); margin-bottom: 8px;">⏱️ One Question Before You Begin</h3>
+                <p style="font-size: 15px; color: var(--text-dark); line-height: 1.7; margin-bottom: 16px;">
+                    <strong>If a cruise line offered you a 6-month contract starting in 4 weeks — would you be ready to say yes?</strong>
+                </p>
+                <div style="display: grid; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text-dark);">
+                        <input type="radio" name="readinessCheck" value="yes" onchange="saveProgress()" style="flex-shrink: 0;"> Yes — I could do it
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text-dark);">
+                        <input type="radio" name="readinessCheck" value="almost" onchange="saveProgress()" style="flex-shrink: 0;"> Almost — a few things need sorting
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text-dark);">
+                        <input type="radio" name="readinessCheck" value="no" onchange="saveProgress()" style="flex-shrink: 0;"> Not yet — I know I need more preparation
+                    </label>
+                </div>
+                <p style="font-size: 12px; color: var(--text-light); margin-top: 12px; font-style: italic;">This is just for your own self-awareness. There's no wrong answer — but be honest.</p>
+            </div>
+
+            <!-- Skills sliders -->
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text-dark); margin-bottom: 8px;">Rate Your Current Skills</h3>
+            <p style="font-size: 14px; color: var(--text-light); margin-bottom: 24px;">Be honest. This is what generates your personalised timeline.</p>
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">Repertoire + Versatility</span>
+                    <span class="skill-score" id="scoreRepertoire">5</span>
+                </div>
+                <p class="skill-description">
+                    How many songs can you perform confidently across multiple genres? (50+ songs = 8-10)
+                </p>
+                <div class="slider-container">
+                    <input type="range" min="1" max="10" value="5" class="slider" id="sliderRepertoire" oninput="updateSkill('repertoire', this.value)">
+                    <div class="slider-labels">
+                        <span class="slider-label">1 - Very Limited</span>
+                        <span class="slider-label">10 - Extensive</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocal -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">Vocal Ability</span>
+                    <span class="skill-score" id="scoreVocal">5</span>
+                </div>
+                <p class="skill-description">
+                    Singing technique, tone quality, range, and control
+                </p>
+                <div class="slider-container">
+                    <input type="range" min="1" max="10" value="5" class="slider" id="sliderVocal" oninput="updateSkill('vocal', this.value)">
+                    <div class="slider-labels">
+                        <span class="slider-label">1 - Beginner</span>
+                        <span class="slider-label">10 - Professional</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instrumental -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">Instrumental Technique</span>
+                    <span class="skill-score" id="scoreInstrumental">5</span>
+                </div>
+                <p class="skill-description">
+                    Technical proficiency on your primary instrument
+                </p>
+                <div class="slider-container">
+                    <input type="range" min="1" max="10" value="5" class="slider" id="sliderInstrumental" oninput="updateSkill('instrumental', this.value)">
+                    <div class="slider-labels">
+                        <span class="slider-label">1 - Basic</span>
+                        <span class="slider-label">10 - Expert</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">Performance Experience</span>
+                    <span class="skill-score" id="scorePerformance">5</span>
+                </div>
+                <p class="skill-description">
+                    Live performance confidence and stage presence
+                </p>
+                <div class="slider-container">
+                    <input type="range" min="1" max="10" value="5" class="slider" id="sliderPerformance" oninput="updateSkill('performance', this.value)">
+                    <div class="slider-labels">
+                        <span class="slider-label">1 - Rarely Performed</span>
+                        <span class="slider-label">10 - Extensive Experience</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Chart -->
+            <div class="chart-container">
+                <canvas id="skillsChart" width="400" height="400"></canvas>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToSection(2)">Continue to Reality Check →</button>
+            </div>
+        </div>
+
+        <!-- Section 2: Reality Check -->
+        <div id="section2" class="section-card">
+            <h2 class="section-title">Reality Check</h2>
+            <p class="section-subtitle">These are factors cruise ship agents actually screen for — and rarely talk about publicly. Knowing where you stand helps you target the right lines and build the right strategy. This is not about gatekeeping. It's about being smart.</p>
+
+            <!-- Factor 1: Nationality / Passport -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">🌍 Nationality & Passport</span>
+                </div>
+                <p class="skill-description" style="margin-bottom: 16px;">
+                    Your passport affects which lines and agencies are easiest to target — not your worth as a musician. UK, EU, and US passports generally have the smoothest processing and the most options. Some lines (especially German ones) prioritise German speakers. Brazilian applicants face additional hurdles with certain lines. Many other nationalities have longer processing times but there are still real opportunities.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">What passport(s) do you hold?</label>
+                    <input type="text" id="passportInput" placeholder="e.g. French, Brazilian, Filipino..." 
+                        style="width:100%; padding:12px; border:2px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:14px; color:var(--text-dark); margin-top:8px;"
+                        oninput="saveProgress()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Languages you speak (beyond your native language):</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item"><input type="checkbox" id="lang-english" onchange="saveProgress()"><label for="lang-english">English</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lang-german" onchange="saveProgress()"><label for="lang-german">German (opens access to AIDA, TUI, Phoenix lines)</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lang-french" onchange="saveProgress()"><label for="lang-french">French</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lang-spanish" onchange="saveProgress()"><label for="lang-spanish">Spanish</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lang-portuguese" onchange="saveProgress()"><label for="lang-portuguese">Portuguese</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lang-other" onchange="saveProgress()"><label for="lang-other">Other</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Factor 2: Age -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">🎂 Age</span>
+                </div>
+                <p class="skill-description" style="margin-bottom: 16px;">
+                    Younger candidates are favoured for future-dated openings because lines are thinking about long-term relationships. If you're 50+, it's not impossible — but it's significantly harder for a first contract unless a line urgently needs to fill a last-minute gap. Knowing this helps you set realistic expectations and target the right opportunities.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Your age bracket:</label>
+                    <select id="ageSelect" onchange="saveProgress()">
+                        <option value="">-- Select --</option>
+                        <option value="under30">Under 30</option>
+                        <option value="30to40">30–40</option>
+                        <option value="40to50">40–50</option>
+                        <option value="50plus">50+</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Factor 3: English Level -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">🗣️ English Level</span>
+                </div>
+                <p class="skill-description" style="margin-bottom: 16px;">
+                    Working English is genuinely necessary — not for formal situations but for real things: chatting with audiences between songs, navigating crew life, reading your schedule, understanding contracts. You don't need to be fluent, but you need to be comfortable enough that language isn't a barrier in the room.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">How would you rate your English?</label>
+                    <select id="englishSelect" onchange="saveProgress()">
+                        <option value="">-- Select --</option>
+                        <option value="basic">Basic — I can manage simple conversations</option>
+                        <option value="conversational">Conversational — comfortable in most everyday situations</option>
+                        <option value="working">Working — I can banter with an audience and handle crew life comfortably</option>
+                        <option value="fluent">Fluent</option>
+                        <option value="native">Native / near-native</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Factor 4: Reading Music -->
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span class="skill-name">🎼 Reading Music</span>
+                </div>
+                <p class="skill-description" style="margin-bottom: 16px;">
+                    For solo pianist-vocalists and guitar vocalists, sight-reading isn't usually required — this course doesn't focus on band roles. But being able to read music is a genuine advantage. Guitar vocalists who read are more in demand than those who don't. It opens doors and signals professionalism to agents.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Your music reading ability:</label>
+                    <select id="readingSelect" onchange="saveProgress()">
+                        <option value="">-- Select --</option>
+                        <option value="none">I don't read music</option>
+                        <option value="basic">I can read basic notation slowly</option>
+                        <option value="good">I read music reasonably well</option>
+                        <option value="fluent">I read fluently / sight-read confidently</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Factor 5: Good Ship Citizen -->
+            <div class="skill-item" style="border-bottom: none;">
+                <div class="skill-header">
+                    <span class="skill-name">⚓ The "Good Ship Citizen" Factor</span>
+                </div>
+                <p class="skill-description" style="margin-bottom: 16px;">
+                    Agencies don't just hire the best musicians — they hire people they trust to be reliable and easy to work with for months at sea. A bad reputation travels fast in this industry. Be honest with yourself here. These things matter as much as your playing.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Check the ones that honestly apply to you:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item"><input type="checkbox" id="citizen-punctual" onchange="saveProgress()"><label for="citizen-punctual">I show up on time and don't cancel last minute</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="citizen-schedule" onchange="saveProgress()"><label for="citizen-schedule">I follow schedules and dress codes without needing reminders</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="citizen-professional" onchange="saveProgress()"><label for="citizen-professional">I stay professional and pleasant even on bad days</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="citizen-diverse" onchange="saveProgress()"><label for="citizen-diverse">I get along with people from very different backgrounds and cultures</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="citizen-confined" onchange="saveProgress()"><label for="citizen-confined">I can live and work closely with the same people for months at a time</label></div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">Anything you want to be honest about regarding ship life readiness?</label>
+                    <textarea id="citizenNotes" placeholder="e.g. I struggle with strict schedules but I'm working on it... or I've lived abroad before and I'm very comfortable with this..." oninput="saveProgress()"></textarea>
+                    <p style="font-size: 12px; color: var(--text-light); margin-top: 6px; font-style: italic;">This is just for your own roadmap. Be honest — it helps you build the right plan.</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(1)">← Back</button>
+                <button class="btn btn-primary" onclick="goToSection(3)">Continue to Timeline →</button>
+            </div>
+        </div>
+
+        <!-- Hidden elements for JS references -->
+        <select id="bottleneckSelect" style="display:none" onchange="handleBottleneckChange()">
+            <option value="">-- Select --</option>
+            <option value="repertoire">Repertoire + Versatility</option>
+            <option value="vocal">Vocal Ability</option>
+            <option value="instrumental">Instrumental Technique</option>
+            <option value="performance">Performance Experience</option>
+        </select>
+        <textarea id="yourWhy" style="display:none"></textarea>
+        <textarea id="acknowledgmentText" style="display:none"></textarea>
+
+        <!-- Section 3: Timeline -->
+        <div id="section3" class="section-card">
+            <h2 class="section-title">Your Timeline</h2>
+            <p class="section-subtitle">Based on your skills, here's a realistic timeline</p>
+
+            <div id="bottleneckDisplay" style="background: var(--primary-lighter); padding: 20px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                <p style="font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 6px;">YOUR MAIN GAP TO WORK ON</p>
+                <p id="bottleneckDisplayText" style="font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px;">—</p>
+                <p style="font-size: 12px; color: var(--text-light);">Not right? <a href="#" onclick="showBottleneckEdit()" style="color: var(--primary);">Change it</a></p>
+                <div id="bottleneckEditRow" style="display:none; margin-top: 12px;">
+                    <select id="bottleneckSelectVisible" onchange="updateBottleneckFromVisible()" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:14px;">
+                        <option value="repertoire">Repertoire + Versatility</option>
+                        <option value="vocal">Vocal Ability</option>
+                        <option value="instrumental">Instrumental Technique</option>
+                        <option value="performance">Performance Experience</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="timelineDisplay" style="background: var(--primary-lighter); padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                <!-- Timeline will be inserted here -->
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Is this timeline realistic for you?</label>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">
+                    Be honest. If you need more or less time, adjust it now.
+                </p>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="commitToTimeline()" style="flex: 2;">
+                        ✅ Yes, I commit to this timeline
+                    </button>
+                    <button class="btn btn-secondary" onclick="adjustTimeline()" style="flex: 1;">
+                        📝 Adjust Timeline
+                    </button>
+                </div>
+            </div>
+
+            <div id="adjustTimelineSection" class="form-group hidden" style="margin-top: 24px;">
+                <label class="form-label">Choose your timeline</label>
+                <select id="customTimeline" onchange="updateCustomTimeline()">
+                    <option value="">-- Select timeline --</option>
+                    <option value="1-2">1-2 months</option>
+                    <option value="3-4">3-4 months</option>
+                    <option value="4-5">4-5 months</option>
+                    <option value="6-9">6-9 months</option>
+                    <option value="9-12">9-12 months</option>
+                    <option value="12+">12+ months</option>
+                </select>
+                <button class="btn btn-primary" onclick="saveCustomTimeline()" style="margin-top: 16px;">
+                    Save My Timeline
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(2)">← Back</button>
+                <button class="btn btn-primary" id="continueToStep4" onclick="goToSection(4)">Continue to Priorities →</button>
+            </div>
+        </div>
+
+        <!-- Section 4: Priorities -->
+        <div id="section4" class="section-card">
+            <h2 class="section-title">Your Number One Priority</h2>
+            <p class="section-subtitle">What matters most this month?</p>
+
+            <div class="form-group" style="margin-bottom: 28px;">
+                <label class="form-label">Why do you want to work on cruise ships?</label>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 8px;">Be honest with yourself. This will anchor your plan.</p>
+                <textarea id="yourWhyVisible" placeholder="I want to work on cruise ships because..." oninput="syncYourWhy()"></textarea>
+            </div>
+
+            <div id="priorityDisplay" style="background: var(--primary-lighter); padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                <!-- Priority will be auto-filled based on bottleneck -->
+            </div>
+
+            <div id="commitmentDropdown" class="form-group hidden">
+                <label class="form-label">How will you work on this?</label>
+                <select id="practiceCommitment">
+                    <!-- Options will be populated based on bottleneck -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Your focus this month:</label>
+                <textarea id="focusThisMonth" placeholder="Based on your bottleneck, what will you focus on this month?"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(3)">← Back</button>
+                <button class="btn btn-primary" onclick="goToSection(5)">Generate My Summary →</button>
+            </div>
+        </div>
+
+        <!-- Section 5: Summary -->
+        <div id="section5" class="section-card">
+            <h2 class="section-title">Your Personalized Roadmap</h2>
+            <p class="section-subtitle">Save this. Review it weekly.</p>
+
+            <div id="summaryContainer">
+                <!-- Summary will be generated here -->
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(4)">← Edit</button>
+                <button class="btn btn-primary" onclick="window.location.href='#'">✓ Finish Module 1</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div id="autoSave" class="auto-save">✓ Saved</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let currentSection = 1;
+        let skillRatings = {
+            repertoire: 5,
+            vocal: 5,
+            instrumental: 5,
+            performance: 5
+        };
+        let selectedBottleneck = '';
+        let selectedTimeline = '';
+        let commitmentData = {};
+        let targetPosition = '';
+        let readinessCheck = '';
+        let chart;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            initializeChart();
+            updateProgressBar();
+            
+            // Show/hide acknowledgment section based on emotional blocks
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('emotional-block')) {
+                    const checkedBlocks = Array.from(document.querySelectorAll('.emotional-block:checked'));
+                    const confidentChecked = checkedBlocks.some(cb => cb.value === 'confident');
+                    const otherBlocksChecked = checkedBlocks.some(cb => cb.value !== 'confident');
+                    
+                    const ackSection = document.getElementById('acknowledgmentSection');
+                    if (otherBlocksChecked) {
+                        ackSection.classList.remove('hidden');
+                    } else {
+                        ackSection.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // Update skill rating
+        function updateSkill(skill, value) {
+            skillRatings[skill] = parseInt(value);
+            document.getElementById('score' + skill.charAt(0).toUpperCase() + skill.slice(1)).textContent = value;
+            updateChart();
+            saveProgress();
+        }
+
+        // Initialize radar chart
+        function initializeChart() {
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Repertoire', 'Vocal', 'Instrumental', 'Performance'],
+                    datasets: [{
+                        label: 'Your Skills',
+                        data: [
+                            skillRatings.repertoire,
+                            skillRatings.vocal,
+                            skillRatings.instrumental,
+                            skillRatings.performance
+                        ],
+                        backgroundColor: 'rgba(122, 184, 217, 0.2)',
+                        borderColor: '#7ab8d9',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#7ab8d9',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#7ab8d9'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update chart
+        function updateChart() {
+            if (chart) {
+                chart.data.datasets[0].data = [
+                    skillRatings.repertoire,
+                    skillRatings.vocal,
+                    skillRatings.instrumental,
+                    skillRatings.performance
+                ];
+                chart.update();
+            }
+        }
+
+        // Handle bottleneck selection
+        function selectPosition(pos) {
+            targetPosition = pos;
+            ['piano', 'guitar', 'unsure'].forEach(p => {
+                const label = document.getElementById('pos-' + p + '-label');
+                if (label) label.style.borderColor = p === pos ? 'var(--primary)' : 'var(--border)';
+                if (label) label.style.background = p === pos ? 'var(--primary-lighter)' : 'var(--white)';
+            });
+            saveProgress();
+        }
+
+        function handleBottleneckChange() {
+            const select = document.getElementById('bottleneckSelect');
+            selectedBottleneck = select.value;
+            saveProgress();
+        }
+
+        // Navigation
+        function goToSection(section) {
+            // Validation before moving forward
+            if (section > currentSection) {
+                if (currentSection === 3) {
+                    if (!selectedTimeline) {
+                        alert('Please commit to a timeline or adjust it before continuing.');
+                        return;
+                    }
+                } else if (currentSection === 4) {
+                    const why = document.getElementById('yourWhyVisible').value.trim();
+                    if (!why) {
+                        alert('Please tell us why you want to work on cruise ships before continuing.');
+                        return;
+                    }
+                    syncYourWhy();
+                }
+            }
+
+            // Map section IDs
+            let sectionId;
+            if (section === 2) sectionId = 'section2';
+            else sectionId = `section${section}`;
+
+            document.querySelectorAll('.section-card').forEach(el => el.classList.remove('active'));
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) targetSection.classList.add('active');
+
+            currentSection = section;
+            updateProgressBar();
+
+            // Auto-fill when entering sections
+            if (section === 3) {
+                autoSuggestBottleneck();
+                displaySuggestedTimeline();
+            } else if (section === 4) {
+                autoFillPriorities();
+            } else if (section === 5) {
+                generateSummary();
+            }
+
+            // Show edit timeline button from step 3 onwards
+            const editBtn = document.querySelector('.edit-timeline-btn');
+            if (section >= 3) editBtn.classList.add('show');
+            else editBtn.classList.remove('show');
+
+            window.scrollTo(0, 0);
+            saveProgress();
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const totalSteps = 5;
+            const steps = document.querySelectorAll('.progress-step');
+            
+            steps.forEach(step => {
+                const stepSection = parseFloat(step.getAttribute('data-section'));
+                step.classList.remove('active', 'completed');
+                if (stepSection === currentSection) step.classList.add('active');
+                else if (stepSection < currentSection) step.classList.add('completed');
+            });
+            
+            const progressLine = document.getElementById('progressLineActive');
+            const sectionIndex = [1, 2, 3, 4, 5].indexOf(currentSection);
+            progressLine.style.width = (sectionIndex / (totalSteps - 1)) * 100 + '%';
+        }
+
+        // Display suggested timeline
+        function displaySuggestedTimeline() {
+            // Count how many skills are over 7/10
+            const veryStrongSkills = Object.values(skillRatings).filter(score => score > 7).length;
+            
+            // Count how many skills are over 5/10
+            const strongSkills = Object.values(skillRatings).filter(score => score > 5).length;
+            
+            let timeline = '';
+            let description = '';
+            
+            // If all 4 skills are over 7, suggest 1-3 months
+            if (veryStrongSkills === 4) {
+                timeline = '1-3 months';
+                description = 'You\'re already very strong across all areas. With focused preparation, 1-3 months is realistic.';
+            }
+            // If at least 2 skills are over 5, suggest 3-6 months
+            else if (strongSkills >= 2) {
+                timeline = '3-6 months';
+                description = 'You have decent skills. With focused work on your bottleneck, 3-6 months is realistic.';
+            }
+            // All weak (0-5 on most skills)
+            else {
+                timeline = '6-9 months';
+                description = 'You need time to build foundational skills. Give yourself 6-9 months to develop properly.';
+            }
+            
+            document.getElementById('timelineDisplay').innerHTML = `
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 12px; color: var(--text-dark);">
+                    ⏱️ Suggested Timeline: ${timeline}
+                </h3>
+                <p style="font-size: 14px; color: var(--text-dark); line-height: 1.8;">
+                    ${description}
+                </p>
+                <p style="font-size: 13px; color: var(--text-light); margin-top: 12px; font-style: italic;">
+                    This is just a suggestion based on your self-assessment. You know yourself best — adjust the timeline if needed.
+                </p>
+            `;
+        }
+
+        // Commit to timeline
+        function commitToTimeline() {
+            // Count skills over 7 and over 5
+            const veryStrongSkills = Object.values(skillRatings).filter(score => score > 7).length;
+            const strongSkills = Object.values(skillRatings).filter(score => score > 5).length;
+            
+            if (veryStrongSkills === 4) {
+                selectedTimeline = '1-3 months';
+            } else if (strongSkills >= 2) {
+                selectedTimeline = '3-6 months';
+            } else {
+                selectedTimeline = '6-9 months';
+            }
+            
+            saveProgress();
+            document.getElementById('continueToStep4').disabled = false;
+            alert('✅ Timeline saved! Continue to priorities.');
+        }
+
+        // Adjust timeline
+        function adjustTimeline() {
+            document.getElementById('adjustTimelineSection').classList.remove('hidden');
+        }
+
+        // Update custom timeline display
+        function updateCustomTimeline() {
+            const value = document.getElementById('customTimeline').value;
+            selectedTimeline = value + ' months';
+        }
+
+        // Save custom timeline
+        function saveCustomTimeline() {
+            const value = document.getElementById('customTimeline').value;
+            if (!value) {
+                alert('Please select a timeline.');
+                return;
+            }
+            
+            selectedTimeline = value + ' months';
+            document.getElementById('adjustTimelineSection').classList.add('hidden');
+            
+            // Update display
+            document.getElementById('timelineDisplay').innerHTML = `
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 12px; color: var(--text-dark);">
+                    ⏱️ Your Chosen Timeline: ${selectedTimeline}
+                </h3>
+                <p style="font-size: 14px; color: var(--text-dark); line-height: 1.8;">
+                    You've chosen ${selectedTimeline} as your timeline. This is what you're committing to.
+                </p>
+            `;
+            
+            saveProgress();
+            alert('✅ Timeline saved!');
+        }
+
+        // Auto-fill priorities
+        function autoFillPriorities() {
+            const bottleneck = selectedBottleneck;
+            let priority = '';
+            
+            if (bottleneck === 'repertoire') {
+                priority = '🎵 Build repertoire to 50+ songs across multiple genres';
+            } else if (bottleneck === 'vocal') {
+                priority = '🎤 Improve vocal technique and control';
+            } else if (bottleneck === 'instrumental') {
+                priority = '🎹 Develop instrumental proficiency';
+            } else if (bottleneck === 'performance') {
+                priority = '🎭 Gain performance experience and confidence';
+            } else {
+                priority = '✨ Polish skills and prepare promo materials';
+            }
+            
+            document.getElementById('priorityDisplay').innerHTML = `
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text-dark);">
+                    Your Number One Priority
+                </h3>
+                <p style="font-size: 16px; font-weight: 600; color: var(--primary);">
+                    ${priority}
+                </p>
+            `;
+            
+            // Show dropdown for vocal or instrumental
+            const dropdownSection = document.getElementById('commitmentDropdown');
+            const dropdown = document.getElementById('practiceCommitment');
+            
+            if (bottleneck === 'vocal' || bottleneck === 'instrumental') {
+                dropdownSection.classList.remove('hidden');
+                
+                dropdown.innerHTML = `
+                    <option value="">-- Select your commitment --</option>
+                    <option value="practice_5days">I will practice on my own 5 days a week</option>
+                    <option value="practice_daily">I will practice daily</option>
+                    <option value="lessons_weekly">I will take weekly lessons</option>
+                    <option value="lessons_biweekly">I will take lessons every 2 weeks</option>
+                    <option value="online_course">I will follow an online course</option>
+                    <option value="message_lara">I will message Lara for guidance</option>
+                    <option value="custom">Other (specify in focus below)</option>
+                `;
+                
+                // Load saved value if exists
+                if (commitmentData.practiceMethod) {
+                    dropdown.value = commitmentData.practiceMethod;
+                }
+            } else {
+                dropdownSection.classList.add('hidden');
+            }
+            
+            // Auto-fill textarea if empty
+            const focusField = document.getElementById('focusThisMonth');
+            if (!focusField.value) {
+                if (bottleneck === 'repertoire') {
+                    focusField.value = 'This month I will focus on learning new songs and expanding my repertoire across different genres.';
+                } else if (bottleneck === 'vocal') {
+                    focusField.value = 'This month I will focus on improving my vocal technique through consistent practice.';
+                } else if (bottleneck === 'instrumental') {
+                    focusField.value = 'This month I will focus on developing my instrumental technique and proficiency.';
+                } else if (bottleneck === 'performance') {
+                    focusField.value = 'This month I will focus on getting more performance experience through gigs or open mics.';
+                }
+            }
+        }
+
+        // Generate summary
+        function generateSummary() {
+            const bottleneck = selectedBottleneck;
+            const bottleneckNames = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const bottleneckName = bottleneckNames[bottleneck] || 'Unknown';
+            const bottleneckScore = skillRatings[bottleneck] || 5;
+            const timeline = selectedTimeline || 'Not set';
+            const yourWhy = document.getElementById('yourWhy')?.value || '';
+            const focusThisMonth = document.getElementById('focusThisMonth')?.value || '';
+            const hasPractice = (bottleneck === 'vocal' || bottleneck === 'instrumental') && commitmentData.practiceMethod;
+
+            // Load reality factors
+            const saved = localStorage.getItem('module1Progress');
+            const rf = saved ? (JSON.parse(saved).realityFactors || {}) : {};
+            const passport = (rf.passport || '').toLowerCase();
+            const age = rf.age || '';
+            const english = rf.english || '';
+            const reading = rf.reading || '';
+            const citizenChecks = rf.citizenChecks || {};
+            const citizenCount = Object.values(citizenChecks).filter(Boolean).length;
+            const hasGerman = rf.languages?.german;
+            const hasFrench = rf.languages?.french;
+            const isBrazilian = passport.includes('brazil');
+            const isFilipino = passport.includes('philip') || passport.includes('filip');
+            const hardPassports = ['banglades','pakistan','nigeria','nepal','indonesia'];
+            const isHardPassport = hardPassports.some(p => passport.includes(p));
+
+            // Skill scores for profile
+            const scores = { repertoire: skillRatings.repertoire||5, vocal: skillRatings.vocal||5, instrumental: skillRatings.instrumental||5, performance: skillRatings.performance||5 };
+            const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+            const strongest = sorted[0];
+            const strongestName = bottleneckNames[strongest[0]];
+
+            // Position feedback
+            const positionFeedback = {
+                piano: { label: '🎹 Piano Bar Entertainer', market: 'Great choice. Piano bar entertainers are the most consistently in-demand solo position on cruise ships. You\'re targeting the right category.', tip: 'Agents look for personality and hosting ability as much as technical skill. The musician who can read the room, chat between songs, and take requests is the one who gets rehired.' },
+                guitar: { label: '🎸 Guitar Vocalist', market: 'Good choice. Guitar vocalists are consistently hireable and in demand.', tip: hasGerman ? 'Your German opens AIDA, TUI and Phoenix lines specifically — mention this in every application.' : (reading === 'fluent' || reading === 'good') ? 'You read music — mention this in every application. It\'s rarer than most agents expect and makes you stand out immediately.' : 'One thing: if you can develop even basic music reading ability, it makes you more hireable for this position. It\'s a differentiator.' },
+                unsure: { label: '🤔 Still Deciding', market: scores.instrumental >= scores.vocal ? 'Based on your skills, piano bar entertainer might be your stronger path — your instrumental score is higher than your vocal.' : 'Based on your skills, guitar vocalist could suit you — your vocal score is relatively strong. But complete the full course before committing.', tip: 'Your position choice shapes everything: your showreel, your applications, which agencies to target. Clarify this early.' }
+            };
+            const pos = positionFeedback[targetPosition] || positionFeedback.unsure;
+
+            // Readiness feedback
+            const readinessFeedback = {
+                yes: { label: '✅ Ready to go', text: 'You said you\'d accept a contract in 4 weeks — that\'s the mindset of someone who\'s close. This course is about closing the remaining gaps and positioning you correctly. Move with urgency.' },
+                almost: { label: '⏳ Almost ready', text: '\'Almost\' usually means 1–2 specific things holding you back. That\'s exactly what this roadmap addresses. You could be ready well within your timeline.' },
+                no: { label: '🛠 Still preparing', text: 'Honest self-awareness is the first quality good agents look for. Knowing where you are now makes everything that follows more effective. Your timeline reflects this.' }
+            };
+            const ready = readinessFeedback[readinessCheck] || { label: '—', text: 'Complete the readiness check in Step 1 next time to get personalised feedback here.' };
+
+            // Age feedback
+            const ageFeedback = {
+                under30: '✅ Your age is an asset. Cruise lines think about long-term relationships — younger candidates get priority for future-dated openings.',
+                '30to40': '✅ Prime range for cruise ship hiring. No complications to manage on age.',
+                '40to50': '✅ Still very hireable. No significant disadvantage at this stage.',
+                '50plus': '⚠️ First contracts at 50+ are harder through standard applications. Focus on last-minute urgent fills rather than future-dated openings, and consider shorter contracts (3–4 months) as entry points. This is strategy, not a barrier.'
+            };
+
+            // English feedback
+            const englishFeedback = {
+                basic: '⚠️ This needs work before you apply. Audience interaction is core to the job — chatting between songs, taking requests, reading the room. Build this alongside your musical preparation.',
+                conversational: '👍 You\'re in the right zone. Practise the casual, spontaneous kind of English — the type you\'d use chatting with strangers at a bar.',
+                working: '✅ Your English is at the level agents need. You\'re fine.',
+                fluent: '✅ Strong English. No barrier here.',
+                native: '✅ Native English is a genuine advantage on ships where most musicians are non-native speakers.'
+            };
+
+            // Reading feedback
+            const readingFeedback = {
+                none: targetPosition === 'guitar' ? '⚠️ For guitar vocalists specifically, even basic lead sheet reading makes you more hireable. Worth developing.' : '👍 Not required for piano bar — but any reading ability you develop is a bonus.',
+                basic: '👍 You have a foundation. Keep developing — even basic reading is more than most applicants have.',
+                good: '✅ Solid advantage. Mention your reading ability in every application.',
+                fluent: '✅ You read fluently — this is a genuine differentiator. Always mention it. It\'s rarer than you think.'
+            };
+
+            // Ship citizen feedback
+            let citizenFeedback;
+            if (citizenCount === 5) citizenFeedback = '✅ All five qualities checked. You understand this is as much a lifestyle as a career. Agents can tell the difference between musicians who want the job and those who can actually handle ship life.';
+            else if (citizenCount >= 3) citizenFeedback = '👍 Mostly there. The qualities you didn\'t check are worth reflecting on — ship life amplifies everything, including the challenges.';
+            else citizenFeedback = '⚠️ Be honest with yourself here. Ship life is intense and close-quarters for months at a time. The music is only half of what agents assess. Worth addressing before you apply.';
+
+            // Passport feedback
+            let passportNote = '';
+            if (isBrazilian) passportNote = '⚠️ Royal Caribbean specifically has additional hurdles for Brazilian passport holders. Prioritise other lines and agencies first.';
+            else if (isFilipino) passportNote = '👍 Filipino musicians have strong representation on ships. Processing can be slower with some lines, but your path is well-established.';
+            else if (isHardPassport) passportNote = '⚠️ Research which agencies are most accessible for your nationality — some are much more open than others. Ask Lara for specific recommendations.';
+            if (hasGerman) passportNote += (passportNote ? ' ' : '') + '🇩🇪 Your German opens AIDA, TUI, and Phoenix — lines that hire exclusively German-speaking musicians. A real advantage.';
+            if (hasFrench) passportNote += (passportNote ? ' ' : '') + '🇫🇷 French-speaking musicians are almost completely absent from the market right now. This is an underexploited opportunity.';
+
+            const html = `
+                <div style="background: var(--primary); padding: 24px; border-radius: 12px; margin-bottom: 28px; color: white;">
+                    <p style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 6px;">Your Assessment Results</p>
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px;">${pos.label}</h3>
+                    <p style="font-size: 14px; opacity: 0.9;">${ready.label} &nbsp;·&nbsp; ${timeline} timeline</p>
+                </div>
+
+                <div style="background: var(--white); border: 2px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 10px; color: var(--text-dark);">🎯 Position & Market Fit</h3>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.7; margin-bottom: 10px;">${pos.market}</p>
+                    <p style="font-size: 14px; color: var(--text-medium); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 10px;">${pos.tip}</p>
+                </div>
+
+                <div style="background: var(--white); border: 2px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 10px; color: var(--text-dark);">⏱️ Your Readiness</h3>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.7;">${ready.text}</p>
+                </div>
+
+                <div style="background: var(--primary-lighter); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 16px; color: var(--text-dark);">📊 Your Skill Profile</h3>
+                    <div style="display: grid; gap: 8px;">
+                        ${sorted.map((s, i) => `
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 12px; font-weight: 600; width: 180px; color: ${i===0?'#48bb78':i===sorted.length-1?'#e53e3e':'var(--text-medium)'};">${bottleneckNames[s[0]]}</span>
+                            <div style="flex:1; background: var(--border); border-radius: 4px; height: 8px;">
+                                <div style="width: ${s[1]*10}%; background: ${i===0?'#48bb78':i===sorted.length-1?'#e53e3e':'var(--primary)'}; height: 8px; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 13px; font-weight: 600; color: var(--text-dark); width: 32px;">${s[1]}/10</span>
+                        </div>`).join('')}
+                    </div>
+                    <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--primary-light); display: grid; gap: 6px;">
+                        <p style="font-size: 13px; color: var(--text-dark); line-height: 1.6;">💪 <strong>Strongest:</strong> ${strongestName} — lean into this in your showreel.</p>
+                        <p style="font-size: 13px; color: var(--text-dark); line-height: 1.6;">🎯 <strong>Bottleneck:</strong> ${bottleneckName} at ${bottleneckScore}/10 — this is what Modules 2–4 will help you address.</p>
+                    </div>
+                </div>
+
+                <div style="background: var(--white); border: 2px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 16px; color: var(--text-dark);">🔍 Your Reality Check</h3>
+                    <div style="display: grid; gap: 12px;">
+                        ${age ? `<div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;font-size:15px;">🎂</span><p style="font-size:13px;color:var(--text-dark);line-height:1.6;">${ageFeedback[age] || ''}</p></div>` : ''}
+                        ${english ? `<div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;font-size:15px;">🗣️</span><p style="font-size:13px;color:var(--text-dark);line-height:1.6;">${englishFeedback[english] || ''}</p></div>` : ''}
+                        ${reading ? `<div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;font-size:15px;">🎼</span><p style="font-size:13px;color:var(--text-dark);line-height:1.6;">${readingFeedback[reading] || ''}</p></div>` : ''}
+                        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;font-size:15px;">⚓</span><p style="font-size:13px;color:var(--text-dark);line-height:1.6;">${citizenFeedback}</p></div>
+                        ${passportNote ? `<div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;font-size:15px;">🌍</span><p style="font-size:13px;color:var(--text-dark);line-height:1.6;">${passportNote}</p></div>` : ''}
+                    </div>
+                </div>
+
+                ${yourWhy ? `<div style="background: var(--primary-lighter); border-left: 4px solid var(--primary); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                    <p style="font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Your Why</p>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.8; font-style: italic;">"${yourWhy}"</p>
+                    <p style="font-size: 12px; color: var(--text-light); margin-top: 8px;">Come back to this when it gets hard.</p>
+                </div>` : ''}
+
+                <div style="background: var(--white); border: 2px solid var(--primary); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 16px; color: var(--text-dark);">📅 Add These to Your Calendar</h3>
+                    ${hasPractice ? `<div style="background:var(--primary-lighter);border-radius:8px;padding:14px 16px;margin-bottom:10px;"><p style="font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">🔁 Every week for ${timeline}</p><p style="font-size:14px;font-weight:500;color:var(--text-dark);">${bottleneck === 'vocal' ? 'Vocal practice' : 'Instrumental practice'} — ${getPracticeLabel(commitmentData.practiceMethod)}</p></div>` : ''}
+                    <div style="background:var(--primary-lighter);border-radius:8px;padding:14px 16px;margin-bottom:10px;"><p style="font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">📌 This week</p><p style="font-size:14px;font-weight:500;color:var(--text-dark);">Complete Module 2 — Repertoire Building</p></div>
+                    <div style="background:var(--primary-lighter);border-radius:8px;padding:14px 16px;margin-bottom:10px;"><p style="font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">📌 In 2 weeks</p><p style="font-size:14px;font-weight:500;color:var(--text-dark);">Start Module 3 — Showreel Production</p></div>
+                    <div style="background:var(--primary-lighter);border-radius:8px;padding:14px 16px;margin-bottom:20px;"><p style="font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">🎯 In ${timeline} — your deadline</p><p style="font-size:14px;font-weight:500;color:var(--text-dark);">Start sending applications — Module 4</p></div>
+                    <button onclick="downloadSummary()" style="width:100%;background:#7ab8d9;color:white;border:none;padding:16px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 12px rgba(122,184,217,0.3);">📥 Download My Plan</button>
+                </div>
+            `;
+
+            document.getElementById('summaryContainer').innerHTML = html;
+        }
+
+        // Generate reality factor flags for summary
+        function generateRealityFlags() {
+            const saved = localStorage.getItem('module1Progress');
+            if (!saved) return '';
+            const data = JSON.parse(saved);
+            const rf = data.realityFactors;
+            if (!rf) return '';
+
+            const flags = [];
+
+            // Passport / nationality flags
+            const passport = (rf.passport || '').toLowerCase();
+            const hardPassports = ['brazil', 'brazilian', 'philippines', 'filipino', 'banglades', 'pakistan', 'nigeria', 'india', 'nepal', 'indonesia'];
+            const isHardPassport = hardPassports.some(p => passport.includes(p));
+            const hasGerman = rf.languages?.german;
+
+            if (isHardPassport) {
+                flags.push({ icon: '🌍', text: 'Research which agencies and lines are most accessible for your passport — some are much more open than others. Ask Lara for specific recommendations.' });
+            }
+            if (passport.includes('brazil') || passport.includes('brazilian')) {
+                flags.push({ icon: '⚠️', text: 'Brazilian passport: Royal Caribbean has additional hurdles. Prioritise other lines and agencies first.' });
+            }
+            if (hasGerman) {
+                flags.push({ icon: '🇩🇪', text: 'You speak German — this opens AIDA, TUI, and Phoenix cruise lines which hire exclusively German-speaking musicians. Include these in your Module 4 applications.' });
+            }
+
+            // Age flags
+            if (rf.age === '50plus') {
+                flags.push({ icon: '🎂', text: 'At 50+, focus your energy on last-minute and urgent fill openings rather than future-dated contracts. Shorter contracts (3–4 months) are more realistic entry points. This is a strategy, not a barrier.' });
+            }
+
+            // English flags
+            if (rf.english === 'basic') {
+                flags.push({ icon: '🗣️', text: 'Build your conversational English before applying — this is a real barrier for audience interaction. Consider this a priority alongside your musical preparation.' });
+            } else if (rf.english === 'conversational') {
+                flags.push({ icon: '🗣️', text: 'Your English is conversational — work on feeling comfortable chatting casually with strangers (audiences, crew). Practice is the best tool here.' });
+            }
+
+            // Reading music
+            if (rf.reading === 'none') {
+                flags.push({ icon: '🎼', text: 'You don\'t currently read music. For guitar vocalists especially, basic reading ability makes you more hireable. Even learning to read chord charts and lead sheets is a real advantage.' });
+            } else if (rf.reading === 'fluent') {
+                flags.push({ icon: '🎼', text: 'You read music fluently — mention this in your applications. It\'s a genuine differentiator.' });
+            }
+
+            // Ship citizen flags
+            const citizenChecks = rf.citizenChecks || {};
+            const checkedCount = Object.values(citizenChecks).filter(Boolean).length;
+            if (checkedCount < 3) {
+                flags.push({ icon: '⚓', text: 'Based on your self-assessment, spend some time honestly reflecting on ship life readiness — reliability and easy-going temperament are as important as your playing to agencies.' });
+            }
+
+            if (flags.length === 0) return '';
+
+            const flagsHtml = flags.map(f => `
+                <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px; background: var(--white); border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                    <span style="font-size: 18px; flex-shrink: 0;">${f.icon}</span>
+                    <p style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">${f.text}</p>
+                </div>
+            `).join('');
+
+            return `
+                <div style="background: var(--primary-light); padding: 20px; border-radius: 8px; margin-bottom: 24px;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 4px; color: var(--text-dark);">🔍 Your Profile Flags</h3>
+                    <p style="font-size: 13px; color: var(--text-medium); margin-bottom: 16px;">Things to factor into your strategy based on your reality check.</p>
+                    ${flagsHtml}
+                </div>
+            `;
+        }
+
+        // Save progress
+        function saveProgress() {
+            // Save practice commitment if visible
+            const practiceCommitment = document.getElementById('practiceCommitment');
+            if (practiceCommitment && !document.getElementById('commitmentDropdown').classList.contains('hidden')) {
+                commitmentData.practiceMethod = practiceCommitment.value;
+            }
+            
+            const data = {
+                currentSection,
+                skillRatings,
+                selectedBottleneck,
+                selectedTimeline,
+                commitmentData,
+                yourWhy: document.getElementById('yourWhyVisible')?.value || document.getElementById('yourWhy')?.value || '',
+                targetPosition,
+                readinessCheck: document.querySelector('input[name="readinessCheck"]:checked')?.value || '',
+                acknowledgmentText: document.getElementById('acknowledgmentText')?.value,
+                focusThisMonth: document.getElementById('focusThisMonth')?.value,
+                emotionalBlocks: Array.from(document.querySelectorAll('.emotional-block:checked')).map(cb => cb.value),
+                realityFactors: {
+                    passport: document.getElementById('passportInput')?.value || '',
+                    languages: {
+                        english: document.getElementById('lang-english')?.checked || false,
+                        german: document.getElementById('lang-german')?.checked || false,
+                        french: document.getElementById('lang-french')?.checked || false,
+                        spanish: document.getElementById('lang-spanish')?.checked || false,
+                        portuguese: document.getElementById('lang-portuguese')?.checked || false,
+                        other: document.getElementById('lang-other')?.checked || false
+                    },
+                    age: document.getElementById('ageSelect')?.value || '',
+                    english: document.getElementById('englishSelect')?.value || '',
+                    reading: document.getElementById('readingSelect')?.value || '',
+                    citizenChecks: {
+                        punctual: document.getElementById('citizen-punctual')?.checked || false,
+                        schedule: document.getElementById('citizen-schedule')?.checked || false,
+                        professional: document.getElementById('citizen-professional')?.checked || false,
+                        diverse: document.getElementById('citizen-diverse')?.checked || false,
+                        confined: document.getElementById('citizen-confined')?.checked || false
+                    },
+                    citizenNotes: document.getElementById('citizenNotes')?.value || ''
+                }
+            };
+
+            localStorage.setItem('module1Progress', JSON.stringify(data));
+            showAutoSave();
+        }
+
+        // Load progress
+        function loadProgress() {
+            const saved = localStorage.getItem('module1Progress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                skillRatings = data.skillRatings || {
+                    repertoire: 5,
+                    vocal: 5,
+                    instrumental: 5,
+                    performance: 5
+                };
+                selectedBottleneck = data.selectedBottleneck || '';
+                selectedTimeline = data.selectedTimeline || '';
+                commitmentData = data.commitmentData || {};
+                
+                // Restore sliders
+                Object.keys(skillRatings).forEach(skill => {
+                    const slider = document.getElementById('slider' + skill.charAt(0).toUpperCase() + skill.slice(1));
+                    if (slider) {
+                        slider.value = skillRatings[skill];
+                        updateSkill(skill, skillRatings[skill]);
+                    }
+                });
+                
+                // Restore form values
+                setTimeout(() => {
+                    if (data.selectedBottleneck) {
+                        const select = document.getElementById('bottleneckSelect');
+                        if (select) select.value = data.selectedBottleneck;
+                    }
+                    
+                    if (data.emotionalBlocks) {
+                        data.emotionalBlocks.forEach(value => {
+                            const checkbox = document.querySelector(`.emotional-block[value="${value}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                        // Trigger acknowledgment visibility
+                        const event = new Event('change', { bubbles: true });
+                        document.querySelector('.emotional-block')?.dispatchEvent(event);
+                    }
+                    
+                    if (data.acknowledgmentText) {
+                        const field = document.getElementById('acknowledgmentText');
+                        if (field) field.value = data.acknowledgmentText;
+                    }
+                    
+                    if (data.targetPosition) {
+                        targetPosition = data.targetPosition;
+                        selectPosition(data.targetPosition);
+                    }
+                    if (data.readinessCheck) {
+                        const radio = document.querySelector(`input[name="readinessCheck"][value="${data.readinessCheck}"]`);
+                        if (radio) radio.checked = true;
+                    }
+                    if (data.yourWhy) {
+                        const hidden = document.getElementById('yourWhy');
+                        if (hidden) hidden.value = data.yourWhy;
+                        const visible = document.getElementById('yourWhyVisible');
+                        if (visible) visible.value = data.yourWhy;
+                    }
+                    
+                    if (data.focusThisMonth) {
+                        const field = document.getElementById('focusThisMonth');
+                        if (field) field.value = data.focusThisMonth;
+                    }
+                    
+                    // Restore reality factors
+                    if (data.realityFactors) {
+                        const rf = data.realityFactors;
+                        if (rf.passport && document.getElementById('passportInput')) document.getElementById('passportInput').value = rf.passport;
+                        if (rf.age && document.getElementById('ageSelect')) document.getElementById('ageSelect').value = rf.age;
+                        if (rf.english && document.getElementById('englishSelect')) document.getElementById('englishSelect').value = rf.english;
+                        if (rf.reading && document.getElementById('readingSelect')) document.getElementById('readingSelect').value = rf.reading;
+                        if (rf.citizenNotes && document.getElementById('citizenNotes')) document.getElementById('citizenNotes').value = rf.citizenNotes;
+                        if (rf.languages) {
+                            Object.keys(rf.languages).forEach(lang => {
+                                const el = document.getElementById('lang-' + lang);
+                                if (el) el.checked = rf.languages[lang];
+                            });
+                        }
+                        if (rf.citizenChecks) {
+                            Object.keys(rf.citizenChecks).forEach(key => {
+                                const el = document.getElementById('citizen-' + key);
+                                if (el) el.checked = rf.citizenChecks[key];
+                            });
+                        }
+                    }
+                }, 100);
+            }
+        }
+
+        // Show auto-save indicator
+        function showAutoSave() {
+            const indicator = document.getElementById('autoSave');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+
+        // Auto-suggest bottleneck based on skill ratings
+        function autoSuggestBottleneck() {
+            const scores = {
+                repertoire: skillRatings['repertoire'] || 5,
+                vocal: skillRatings['vocal'] || 5,
+                instrumental: skillRatings['instrumental'] || 5,
+                performance: skillRatings['performance'] || 5
+            };
+            const lowest = Object.entries(scores).sort((a, b) => a[1] - b[1])[0];
+            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            
+            const select = document.getElementById('bottleneckSelect');
+            if (select) { select.value = lowest[0]; }
+            selectedBottleneck = lowest[0];
+            
+            const displayText = document.getElementById('bottleneckDisplayText');
+            if (displayText) displayText.textContent = names[lowest[0]] + ' (' + lowest[1] + '/10)';
+            
+            const visibleSelect = document.getElementById('bottleneckSelectVisible');
+            if (visibleSelect) visibleSelect.value = lowest[0];
+        }
+
+        function showBottleneckEdit() {
+            document.getElementById('bottleneckEditRow').style.display = 'block';
+            return false;
+        }
+
+        function updateBottleneckFromVisible() {
+            const val = document.getElementById('bottleneckSelectVisible').value;
+            selectedBottleneck = val;
+            const select = document.getElementById('bottleneckSelect');
+            if (select) select.value = val;
+            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const score = skillRatings[val] || 5;
+            document.getElementById('bottleneckDisplayText').textContent = names[val] + ' (' + score + '/10)';
+            saveProgress();
+        }
+
+        function syncYourWhy() {
+            const visible = document.getElementById('yourWhyVisible');
+            const hidden = document.getElementById('yourWhy');
+            if (visible && hidden) hidden.value = visible.value;
+            saveProgress();
+        }
+
+        // Download summary
+        function downloadSummary() {
+            const bottleneck = selectedBottleneck;
+            const bottleneckName = { repertoire: 'Repertoire & Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' }[bottleneck] || '';
+            const timeline = selectedTimeline || 'Not set';
+            const yourWhy = document.getElementById('yourWhy')?.value || '';
+            const focusThisMonth = document.getElementById('focusThisMonth')?.value || '';
+            const hasPractice = (bottleneck === 'vocal' || bottleneck === 'instrumental') && commitmentData.practiceMethod;
+            const practiceLabel = hasPractice ? getPracticeLabel(commitmentData.practiceMethod) : '';
+            const positionNames = { piano: '🎹 Piano Bar Entertainer', guitar: '🎸 Guitar Vocalist', unsure: '🤔 Still deciding' };
+            const positionName = positionNames[targetPosition] || 'Not selected';
+            const readinessLabels = { yes: 'Ready to go', almost: 'Almost — a few things to sort', no: 'Not yet — needs more preparation' };
+            const readinessText = readinessLabels[readinessCheck] || '';
+            const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My Cruise Ship Musician Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f8f9fa;
+    color: #2c3e50;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #d4e8f0;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 6px;
+  }
+  .header p { font-size: 14px; color: #6b7280; font-weight: 300; }
+
+  /* Progress Steps */
+  .progress-container {
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+  .progress-line {
+    position: absolute; top: 16px; left: 0; right: 0;
+    height: 2px; background: #7ab8d9; z-index: 0;
+  }
+  .progress-step { text-align: center; flex: 1; position: relative; z-index: 2; }
+  .progress-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #7ab8d9;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+  }
+  .progress-label { font-size: 12px; color: #7ab8d9; font-weight: 600; }
+
+  /* Cards */
+  .card {
+    background: #fff;
+    padding: 28px 32px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .card-blue { background: #f0f7fa; box-shadow: none; border-left: 4px solid #7ab8d9; }
+
+  .card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 600;
+    color: #2c3e50; margin-bottom: 10px;
+  }
+  .card p { font-size: 14px; color: #4b5563; line-height: 1.7; }
+  .card .value {
+    font-size: 22px; font-weight: 600;
+    color: #7ab8d9; margin: 4px 0 6px;
+  }
+
+  /* Calendar items */
+  .cal-item {
+    background: #f0f7fa;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .cal-tag {
+    font-size: 10px; font-weight: 600;
+    color: #7ab8d9; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 3px;
+  }
+  .cal-text { font-size: 14px; font-weight: 500; color: #2c3e50; }
+  .cal-note { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+  /* Footer */
+  .footer {
+    margin-top: 32px; padding-top: 16px;
+    border-top: 2px solid #d4e8f0;
+    text-align: center;
+    font-size: 11px; color: #9ca3af; font-weight: 300;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #e5e7eb; }
+    .progress-container { box-shadow: none; border: 1px solid #e5e7eb; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>My Cruise Ship Musician Plan</h1>
+    <p>How to Become a Cruise Ship Musician · Lara Bruyelles · Module 1 · ${today}</p>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-steps">
+      <div class="progress-line"></div>
+      <div class="progress-step"><div class="progress-circle">1</div><div class="progress-label">Skills</div></div>
+      <div class="progress-step"><div class="progress-circle">2</div><div class="progress-label">Reality Check</div></div>
+      <div class="progress-step"><div class="progress-circle">3</div><div class="progress-label">Timeline</div></div>
+      <div class="progress-step"><div class="progress-circle">4</div><div class="progress-label">Priorities</div></div>
+      <div class="progress-step"><div class="progress-circle">✓</div><div class="progress-label">Summary</div></div>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <h2>🎯 My Target Position</h2>
+    <div class="value">${positionName}</div>
+    ${readinessText ? `<p>6-month readiness: ${readinessText}</p>` : ''}
+  </div>
+
+  <div class="card card-blue">
+    <h2>💡 My Why</h2>
+    <p>${yourWhy}</p>
+  </div>
+
+  <div class="card">
+    <h2>🎯 My #1 Bottleneck</h2>
+    <div class="value">${bottleneckName}</div>
+    <p>This is what I'm focusing on first.</p>
+  </div>
+
+  <div class="card card-blue">
+    <h2>⏱️ My Timeline</h2>
+    <div class="value">${timeline}</div>
+    <p>From today until I'm ready to apply.</p>
+  </div>
+
+  <div class="card">
+    <h2>📌 This Month's Focus</h2>
+    <p>${focusThisMonth}</p>
+  </div>
+
+  <div class="card card-blue">
+    <h2>📅 Add These to Your Calendar</h2>
+    ${hasPractice ? `
+    <div class="cal-item">
+      <div class="cal-tag">🔁 Recurring — every week for ${timeline}</div>
+      <div class="cal-text">${bottleneck === 'vocal' ? 'Vocal practice' : 'Instrumental practice'} — ${practiceLabel}</div>
+      <div class="cal-note">Pick a consistent day and stick to it</div>
+    </div>` : ''}
+    <div class="cal-item">
+      <div class="cal-tag">📌 This week</div>
+      <div class="cal-text">Complete Module 2 — Repertoire Building</div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-tag">📌 In 2 weeks</div>
+      <div class="cal-text">Start Module 3 — Showreel Production</div>
+    </div>
+    <div class="cal-item">
+      <div class="cal-tag">🎯 In ${timeline} — your deadline</div>
+      <div class="cal-text">Start sending applications — Module 4</div>
+      <div class="cal-note">Work backwards from this date.</div>
+    </div>
+  </div>
+
+  <div class="footer">How to Become a Cruise Ship Musician · Lara Bruyelles · The International Musician</div>
+  <div style="text-align:center; padding: 24px; display:none;" class="no-print">
+    <button onclick="window.print()" style="background:#7ab8d9;color:white;border:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:sans-serif;">🖨️ Save as PDF</button>
+  </div>
+  <style>.no-print{display:block!important;} @media print{.no-print{display:none!important;}}</style>
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const w = window.open(url, '_blank');
+            if (!w) {
+                // Fallback: download as file if popup blocked
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'My-Cruise-Ship-Plan.html';
+                a.click();
+            }
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }
+
+        // Get practice label from commitment
+        function getPracticeLabel(method) {
+            const labels = {
+                'practice_5days': 'Practice 5 days/week',
+                'practice_daily': 'Practice daily',
+                'lessons_weekly': 'Weekly lessons',
+                'lessons_biweekly': 'Bi-weekly lessons',
+                'online_course': 'Online course',
+                'message_lara': 'Get guidance from Lara',
+                'custom': 'Custom plan'
+            };
+            return labels[method] || method;
+        }
+
+        // Save Module 1 tasks to localStorage
+        function saveModule1Tasks() {
+            const bottleneck = selectedBottleneck;
+            const timeline = selectedTimeline;
+            
+            // Guard: if no timeline set, don't save
+            if (!timeline) {
+                console.warn('saveModule1Tasks: no timeline selected yet');
+                return;
+            }
+            
+            // Calculate total weeks based on timeline - FIXED
+            let totalWeeks = 24;
+            if (timeline.includes('1-2')) totalWeeks = 8;
+            else if (timeline.includes('1-3')) totalWeeks = 12;
+            else if (timeline.includes('3-4')) totalWeeks = 16;
+            else if (timeline.includes('3-6')) totalWeeks = 24;
+            else if (timeline.includes('4-5')) totalWeeks = 20;
+            else if (timeline.includes('6-9')) totalWeeks = 36;
+            else if (timeline.includes('9-12')) totalWeeks = 48;
+            else if (timeline.includes('12+')) totalWeeks = 52;
+
+            const tasks = {
+                moduleNumber: 1,
+                moduleName: 'Assessment & Planning',
+                timeline: timeline,
+                totalWeeks: totalWeeks,
+                bottleneck: bottleneck,
+                commitment: commitmentData,
+                yourWhy: document.getElementById('yourWhy')?.value || '',
+                tasks: []
+            };
+
+            // Add Week 1 tasks (all three in week 1)
+            tasks.tasks.push(
+                { weekNumber: 1, text: 'Complete Module 1 assessment', completed: false },
+                { weekNumber: 1, text: 'Review your personalized timeline', completed: false },
+                { weekNumber: 1, text: 'Identify your number one bottleneck', completed: false }
+            );
+
+            // Add recurring weekly practice task if vocal/instrumental (weeks 2 onwards)
+            if ((bottleneck === 'vocal' || bottleneck === 'instrumental') && commitmentData.practiceMethod) {
+                const practiceText = 'Work on ' + bottleneck + ' improvement (' + getPracticeLabel(commitmentData.practiceMethod) + ')';
+                
+                // Add ONE task per week from week 2 to totalWeeks
+                for (let i = 2; i <= totalWeeks; i++) {
+                    tasks.tasks.push({
+                        weekNumber: i,
+                        text: practiceText,
+                        completed: false
+                    });
+                }
+            }
+
+            localStorage.setItem('module1_tasks', JSON.stringify(tasks));
+            
+            // Also save timeline and why for calendar - preserve exact string
+            localStorage.setItem('courseTimeline', timeline);
+            localStorage.setItem('courseTotalWeeks', totalWeeks.toString());
+            localStorage.setItem('courseWhy', document.getElementById('yourWhy')?.value || '');
+            
+            console.log('Saved Module 1:', {timeline, totalWeeks, taskCount: tasks.tasks.length});
+        }
+
+        // Open master calendar
+        function saveTasksAndOpenCalendar() {
+            saveModule1Tasks();
+            window.open('mc.html', '_blank');
+        }
+
+        // Auto-save on input
+        document.addEventListener('input', saveProgress);
+        document.addEventListener('change', saveProgress);
+    </script>
+</body>
+</html>
