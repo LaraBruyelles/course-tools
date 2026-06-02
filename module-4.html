@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4: The Application Process</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--p:#7ab8d9;--pl:#d4e8f0;--pp:#f0f7fa;--td:#2c3e50;--tm:#4b5563;--tl:#6b7280;--bg:#f8f9fa;--w:#ffffff;--b:#e5e7eb;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--td);}
+.wrap{max-width:800px;margin:0 auto;padding:40px 20px;}
+.hdr{text-align:center;margin-bottom:36px;padding-bottom:20px;border-bottom:2px solid var(--pl);}
+.hdr h1{font-family:'Playfair Display',serif;font-size:34px;font-weight:600;margin-bottom:6px;}
+.hdr p{font-size:14px;color:var(--tl);}
+/* NAV */
+.nav{background:var(--w);padding:20px;border-radius:12px;margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.steps{display:flex;justify-content:space-between;position:relative;}
+.line-bg{position:absolute;top:16px;left:0;right:0;height:2px;background:var(--b);z-index:0;}
+.line-fg{position:absolute;top:16px;left:0;height:2px;background:var(--p);z-index:1;transition:width .3s;}
+.step{flex:1;text-align:center;position:relative;z-index:2;cursor:pointer;}
+.circle{width:32px;height:32px;border-radius:50%;background:var(--w);border:2px solid var(--b);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--tl);transition:all .3s;}
+.step.active .circle,.step.done .circle{background:var(--p);border-color:var(--p);color:var(--w);}
+.slbl{font-size:11px;color:var(--tl);font-weight:500;}
+.step.active .slbl{color:var(--p);font-weight:600;}
+/* CARDS */
+.card{background:var(--w);padding:36px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);display:none;}
+.card.active{display:block;animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card h2{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:10px;}
+.card .sub{font-size:15px;color:var(--tm);margin-bottom:28px;line-height:1.6;}
+/* BUTTONS */
+.btn{padding:13px 22px;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-p{background:var(--p);color:var(--w);box-shadow:0 4px 12px rgba(122,184,217,.3);}
+.btn-p:hover{background:#6aa7c8;transform:translateY(-1px);}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-s{background:var(--w);color:var(--td);border:2px solid var(--b);}
+.btn-s:hover{border-color:var(--p);color:var(--p);}
+.btns{display:flex;gap:14px;margin-top:28px;}
+/* FORM */
+.fg{margin-bottom:18px;}
+.fg label{font-weight:600;font-size:13px;display:block;margin-bottom:6px;}
+.fg input,.fg textarea,.fg select{width:100%;padding:11px 14px;border:2px solid var(--b);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;background:var(--w);transition:border-color .2s;margin-top:0;}
+.fg input:focus,.fg textarea:focus{outline:none;border-color:var(--p);}
+.fg textarea{min-height:110px;resize:vertical;}
+.fg .hint{font-size:11px;color:var(--tl);margin-top:4px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.cb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:6px;}
+.cb-card{padding:9px 12px;background:var(--w);border:2px solid var(--b);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;transition:border-color .2s;}
+.cb-card:hover{border-color:var(--p);}
+/* CV PREVIEW */
+.cv-box{background:#f5f5f5;padding:24px;border-radius:8px;border:2px solid #ddd;margin-top:24px;}
+.cv-box h3{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:12px;}
+.cv-inner{background:var(--w);padding:24px 28px;border-radius:4px;border:1px solid #e0e0e0;}
+.cv-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.cv-pos{font-size:12px;color:#555;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:3px 0;}
+.cv-contact{font-size:11px;color:#777;margin-bottom:14px;}
+.cv-sec{margin-top:12px;padding-top:12px;border-top:1px solid #ddd;}
+.cv-sec-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1a1a1a;margin-bottom:4px;}
+.cv-sec-txt{font-size:12px;color:#444;line-height:1.6;}
+/* INFO BOXES */
+.ib{background:var(--pp);border-left:4px solid var(--p);border-radius:0 8px 8px 0;padding:18px 22px;margin-bottom:20px;}
+.ib h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:6px;}
+.ib p{font-size:13px;color:var(--tm);line-height:1.7;}
+.ib-warn{background:#fff9e6;border-color:#f59e0b;border-radius:8px;border-left-width:4px;}
+.ib-warn p{color:#78350f;}
+.ib-blue{background:var(--pl);border-radius:8px;padding:18px 22px;margin-bottom:20px;}
+.ib-blue h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:8px;}
+.ib-blue p{font-size:13px;color:var(--tm);line-height:1.7;}
+/* GRID BOXES */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.gbox{background:var(--w);border:2px solid var(--b);border-radius:8px;padding:16px;}
+.gbox strong{display:block;font-size:13px;margin-bottom:6px;}
+.gbox p{font-size:12px;color:var(--tm);line-height:1.6;}
+.gbox.green{border-top:3px solid #10b981;}
+.gbox.red{background:#fff1f2;border:2px solid #fecdd3;}
+.gbox.red strong{color:#9f1239;}
+.gbox.red ul{list-style:none;font-size:12px;color:#881337;line-height:2.1;}
+.gbox.gn{background:#f0fdf4;border:2px solid #bbf7d0;}
+.gbox.gn strong{color:#14532d;}
+.gbox.gn ul{list-style:none;font-size:12px;color:#166534;line-height:2.1;}
+/* QUOTE */
+.quote{background:var(--w);border:2px solid var(--b);border-radius:8px;padding:18px 22px 14px 44px;position:relative;margin-bottom:18px;}
+.quote::before{content:'"';font-size:48px;color:var(--pl);position:absolute;top:8px;left:14px;line-height:1;font-family:'Playfair Display',serif;}
+.quote blockquote{font-size:13px;color:var(--tm);line-height:1.8;font-style:italic;}
+.quote cite{font-size:11px;color:var(--tl);font-weight:600;margin-top:8px;display:block;}
+/* EMAIL EXAMPLE */
+.email-ex{background:var(--w);border:2px solid var(--b);border-radius:8px;overflow:hidden;margin-bottom:22px;}
+.email-ex-hdr{background:var(--pp);padding:12px 18px;border-bottom:2px solid var(--pl);}
+.email-ex-hdr strong{font-size:13px;}
+.email-ex-hdr p{font-size:11px;color:var(--tl);margin-top:2px;}
+.email-ex-body{padding:16px 18px;font-family:'Monaco','Courier New',monospace;font-size:12px;color:var(--tm);white-space:pre-wrap;line-height:1.8;background:#fafafa;}
+.email-ex-tip{padding:8px 18px;background:var(--bg);border-top:1px solid var(--b);font-size:11px;color:var(--tl);font-style:italic;}
+/* CHECKLIST */
+.clist{display:grid;gap:8px;margin-bottom:16px;}
+.clist label{display:flex;align-items:center;gap:11px;cursor:pointer;padding:11px 14px;background:var(--bg);border:2px solid var(--b);border-radius:8px;font-size:13px;transition:border-color .2s;}
+.clist label:hover{border-color:var(--pl);}
+.clist input[type=checkbox]{width:17px;height:17px;accent-color:var(--p);flex-shrink:0;}
+/* TEMPLATES */
+.tcard{border:2px solid var(--b);border-radius:8px;margin-bottom:20px;overflow:hidden;}
+.tcard-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--pp);border-bottom:2px solid var(--pl);}
+.tcard-hdr h3{font-family:'Playfair Display',serif;font-size:16px;}
+.copy-btn{padding:7px 14px;background:var(--p);color:var(--w);border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+.tcard-subj{padding:10px 18px;background:var(--w);font-size:13px;border-bottom:1px solid var(--b);}
+.tcard-body{padding:14px 18px;background:var(--w);font-family:'Monaco','Courier New',monospace;font-size:12px;color:var(--tm);white-space:pre-wrap;line-height:1.7;}
+.tcard-tip{padding:8px 18px;background:var(--bg);font-size:11px;color:var(--tl);font-style:italic;border-top:1px solid var(--b);}
+/* AGENTS */
+.agent-sec-ttl{font-family:'Playfair Display',serif;font-size:18px;color:var(--td);margin:24px 0 14px;padding-bottom:6px;border-bottom:2px solid var(--pl);}
+.acard{display:flex;justify-content:space-between;align-items:center;padding:18px;background:var(--w);border:2px solid var(--b);border-radius:8px;margin-bottom:10px;gap:18px;transition:border-color .2s;}
+.acard:hover{border-color:var(--pl);}
+.acard.pri{border-left:4px solid var(--p);}
+.acard-info{flex:1;}
+.acard-name{font-weight:600;font-size:14px;margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.badge{font-size:10px;padding:2px 9px;border-radius:12px;background:var(--pl);color:var(--p);font-weight:600;}
+.acard-note{font-size:12px;color:var(--tl);font-style:italic;margin:3px 0 7px;}
+.atags{display:flex;gap:8px;flex-wrap:wrap;}
+.atag{font-size:11px;padding:3px 9px;background:var(--bg);border-radius:6px;color:var(--tm);border:1px solid var(--b);}
+.abtn{padding:9px 18px;background:var(--p);color:var(--w);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .2s;}
+.abtn:hover{background:#6aa7c8;transform:translateY(-1px);}
+.abtn.chk{background:var(--w);color:var(--p);border:2px solid var(--pl);}
+.abtn.chk:hover{background:var(--pp);}
+/* FOLLOW-UP */
+.fu-step{display:flex;gap:18px;padding:18px;background:var(--w);border:2px solid var(--b);border-radius:8px;margin-bottom:12px;align-items:flex-start;}
+.fu-dot{width:38px;height:38px;border-radius:50%;background:var(--p);color:var(--w);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.fu-content h4{font-size:14px;font-weight:600;margin-bottom:5px;}
+.fu-content p{font-size:13px;color:var(--tm);line-height:1.5;}
+.cal-box{background:var(--pp);border:2px solid var(--pl);border-radius:8px;padding:20px;margin-bottom:20px;}
+.cal-box h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:12px;}
+.cal-item{padding:9px 12px;margin-bottom:5px;background:var(--w);border-radius:6px;border-left:3px solid var(--p);font-size:13px;}
+/* FINAL */
+.final-clist label{display:flex;align-items:flex-start;gap:11px;cursor:pointer;padding:13px 16px;background:var(--w);border:2px solid var(--b);border-radius:8px;font-size:14px;margin-bottom:8px;transition:border-color .2s;}
+.final-clist label:hover{border-color:var(--pl);}
+.final-clist input{width:17px;height:17px;accent-color:var(--p);flex-shrink:0;margin-top:2px;}
+/* FOLDER CHECK */
+.folder-check{background:var(--pp);border:2px solid var(--pl);border-radius:8px;padding:14px 18px;margin-top:20px;}
+.folder-check label{display:flex;align-items:flex-start;gap:11px;cursor:pointer;font-size:13px;color:var(--td);line-height:1.6;}
+.folder-check input{width:17px;height:17px;accent-color:var(--p);flex-shrink:0;margin-top:2px;}
+/* AUTOSAVE */
+.autosave{position:fixed;bottom:20px;right:20px;background:var(--p);color:var(--w);padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(16px);transition:all .3s;pointer-events:none;z-index:100;}
+.autosave.show{opacity:1;transform:translateY(0);}
+@media(max-width:680px){.wrap{padding:16px;}.card{padding:22px;}.fgrid,.grid2{grid-template-columns:1fr;}.btns{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <h1>Module 4: The Application Process</h1>
+  <p>The International Musician &middot; How to Become a Cruise Ship Musician &middot; Lara Bruyelles</p>
+</div>
+
+<div class="nav">
+  <div class="steps" id="steps">
+    <div class="line-bg"></div>
+    <div class="line-fg" id="lineFg" style="width:0%"></div>
+    <div class="step active" onclick="go(1)"><div class="circle">1</div><div class="slbl">Your CV</div></div>
+    <div class="step" onclick="go(2)"><div class="circle">2</div><div class="slbl">How to Apply</div></div>
+    <div class="step" onclick="go(3)"><div class="circle">3</div><div class="slbl">Agent Strategy</div></div>
+    <div class="step" onclick="go(4)"><div class="circle">4</div><div class="slbl">Agencies</div></div>
+    <div class="step" onclick="go(5)"><div class="circle">5</div><div class="slbl">Follow-Ups</div></div>
+    <div class="step" onclick="go(6)"><div class="circle">6</div><div class="slbl">Done</div></div>
+  </div>
+</div>
+
+<!-- S1: CV BUILDER -->
+<div id="s1" class="card active">
+  <h2>Prepare Your Musician CV</h2>
+  <p class="sub">Build a professional one-page CV to attach to every application.</p>
+  <div class="fgrid">
+    <div class="fg"><label>Full Name</label><input type="text" id="cvName" placeholder="Your full name" oninput="updateCV();save()"></div>
+    <div class="fg"><label>Email</label><input type="email" id="cvEmail" placeholder="your@email.com" oninput="updateCV();save()"></div>
+    <div class="fg"><label>Phone</label><input type="tel" id="cvPhone" placeholder="+1 234 567 8900" oninput="updateCV();save()"></div>
+    <div class="fg"><label>Location</label><input type="text" id="cvLoc" placeholder="City, Country" oninput="updateCV();save()"></div>
+  </div>
+  <div class="fg"><label>Position Applying For</label><input type="text" id="cvPos" placeholder="e.g. Piano Bar Entertainer, Guitar Vocalist..." oninput="updateCV();save()"></div>
+  <div class="fg"><label>Performance Experience</label><textarea id="cvExp" placeholder="Piano Bar Residency, Hotel Bristol Lyon (2023-2024) — 4 nights/week, 3-hour sets" oninput="updateCV();save()"></textarea><span class="hint">List venue names, dates, and what you performed</span></div>
+  <div class="fg"><label>Instruments</label>
+    <div class="cb-grid" id="instGrid">
+      <label class="cb-card"><input type="checkbox" value="Piano" onchange="updateCV();save()"> Piano</label>
+      <label class="cb-card"><input type="checkbox" value="Keyboard" onchange="updateCV();save()"> Keyboard</label>
+      <label class="cb-card"><input type="checkbox" value="Guitar" onchange="updateCV();save()"> Guitar</label>
+      <label class="cb-card"><input type="checkbox" value="Bass" onchange="updateCV();save()"> Bass</label>
+      <label class="cb-card"><input type="checkbox" value="Drums" onchange="updateCV();save()"> Drums</label>
+      <label class="cb-card"><input type="checkbox" value="Vocals" onchange="updateCV();save()"> Vocals</label>
+    </div>
+  </div>
+  <div class="fgrid">
+    <div class="fg"><label>Other Instruments</label><input type="text" id="cvOther" placeholder="Saxophone, Violin..." oninput="updateCV();save()"></div>
+    <div class="fg"><label>Repertoire Size</label><input type="number" id="cvRep" placeholder="e.g. 600" oninput="updateCV();save()"><span class="hint">Songs performance-ready</span></div>
+  </div>
+  <div class="fg"><label>Special Skills (optional)</label><input type="text" id="cvSkills" placeholder="Sight-reading, hosting, transposing..." oninput="updateCV();save()"></div>
+  <div class="cv-box">
+    <h3>CV Preview</h3>
+    <div class="cv-inner" id="cvPreview">
+      <div class="cv-name">Your Name</div>
+      <div class="cv-pos">Musician</div>
+      <div class="cv-contact">email &middot; phone &middot; location</div>
+    </div>
+  </div>
+  <div style="margin-top:20px;">
+    <button class="btn btn-p" style="width:100%;" onclick="dlCV()">Download CV as PDF</button>
+    <p style="font-size:11px;color:var(--tl);text-align:center;margin-top:6px;">Keep it to ONE PAGE — agencies receive hundreds of applications</p>
+  </div>
+  <div class="folder-check">
+    <label><input type="checkbox" id="folderChk" onchange="updateContinueBtn()">
+      I have downloaded my CV and moved it to my <strong>"promo materials ready to send"</strong> folder from the course introduction</label>
+  </div>
+  <div class="btns"><button class="btn btn-p" id="s1Btn" onclick="go(2)" disabled style="opacity:.4;cursor:not-allowed;flex:1;">Continue &rarr;</button></div>
+</div>
+
+<!-- S2: HOW TO APPLY -->
+<div id="s2" class="card">
+  <h2>How to Write Your Applications</h2>
+  <p class="sub">Before the templates &mdash; understand what separates ignored applications from ones that get a response.</p>
+
+  <!-- Video -->
+  <div id="loom-facade" onclick="loadLoom()" style="position:relative;padding-bottom:62.5%;height:0;margin-bottom:28px;cursor:pointer;border-radius:8px;overflow:hidden;background:#000;">
+    <img src="https://cdn.loom.com/sessions/thumbnails/a8e5564623314233ac340cd3dce9e62c-1080p-00001.jpg" onerror="this.src='https://cdn.loom.com/sessions/thumbnails/a8e5564623314233ac340cd3dce9e62c-with-play.gif';this.onerror=null;" alt="Video thumbnail" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.15);transition:background .2s;" onmouseover="this.style.background='rgba(0,0,0,.28)'" onmouseout="this.style.background='rgba(0,0,0,.15)'">
+      <div style="width:72px;height:72px;background:#00b9f2;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.35);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+      </div>
+    </div>
+  </div>
+  <script>
+  function loadLoom(){
+    var f=document.getElementById('loom-facade');
+    var wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;padding-bottom:62.5%;height:0;margin-bottom:28px;';
+    var iframe=document.createElement('iframe');
+    iframe.src='https://www.loom.com/embed/a8e5564623314233ac340cd3dce9e62c?autoplay=1';
+    iframe.frameBorder='0';
+    iframe.setAttribute('allowfullscreen','');
+    iframe.setAttribute('webkitallowfullscreen','');
+    iframe.setAttribute('mozallowfullscreen','');
+    iframe.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;';
+    wrap.appendChild(iframe);
+    f.parentNode.replaceChild(wrap,f);
+  }
+  </script>
+
+  <!-- Quick check -->
+  <div style="background:var(--pp);border:2px solid var(--pl);border-radius:8px;padding:16px 20px;margin-bottom:28px;display:flex;gap:14px;align-items:flex-start;">
+    <div style="font-size:22px;flex-shrink:0;">&#10003;</div>
+    <div><strong style="font-size:13px;display:block;margin-bottom:6px;">Quick pre-application check</strong>
+      <div style="font-size:12px;color:var(--tm);line-height:1.9;">YouTube link is PUBLIC or UNLISTED &nbsp;&middot;&nbsp; Song list PDF readable on mobile &nbsp;&middot;&nbsp; CV is one page &nbsp;&middot;&nbsp; Sending to ONE agent at a time</div>
+    </div>
+  </div>
+
+  <!-- #1 Reason -->
+  <div style="background:var(--pp);border-left:5px solid var(--p);border-radius:0 8px 8px 0;padding:26px 28px;margin-bottom:22px;">
+    <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;">The #1 Reason Musicians Get Ignored</h3>
+    <p style="font-size:15px;font-weight:600;color:var(--p);margin-bottom:14px;">(It&apos;s Not Talent)</p>
+    <p style="font-size:14px;line-height:1.8;">The most common reason a musician gets ignored is an <strong>unprofessional approach</strong> &mdash; not a lack of talent. Agents see hundreds of applications. The ones that get a response are deliberate, polished, and easy to act on.</p>
+  </div>
+
+  <div class="quote">
+    <blockquote>If you can&apos;t put together a basic professional email, what chance is there that you&apos;ll read your schedule, show up on time, dress right, and be reliable on a ship? The email is a proxy for on-board reliability.</blockquote>
+    <cite>&mdash; The agent&apos;s logic</cite>
+  </div>
+
+  <div class="ib-warn ib" style="margin-bottom:20px;">
+    <h4 style="color:#92400e;">&#9888; Warning: Some agents auto-forward your submission immediately</h4>
+    <p>Some agents forward your promo to every cruise line the moment they receive it &mdash; to &ldquo;claim ownership.&rdquo; A sloppy, rushed submission can get you <strong>burned across the entire market at once</strong>. Be deliberate about who you send to.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="gbox red"><strong>&#10007; Avoid</strong>
+      <ul><li>&bull; CC&rsquo;ing 50 agents in one email</li><li>&bull; &ldquo;Dear Agent, available from tomorrow&rdquo;</li><li>&bull; Generic spray-and-pray emails</li><li>&bull; Sending before materials are ready</li><li>&bull; Vague Facebook messages</li></ul>
+    </div>
+    <div class="gbox gn"><strong>&#10003; Be Surgical</strong>
+      <ul><li>&bull; One email per agent, written for them</li><li>&bull; Use their name if you have it</li><li>&bull; Research the agency before applying</li><li>&bull; Send only when your reel is polished</li><li>&bull; State your position clearly</li></ul>
+    </div>
+  </div>
+
+  <div class="email-ex">
+    <div class="email-ex-hdr"><strong>&#10003; What a Good First Email Looks Like</strong><p>Simple, honest, personal. Gets straight to the point.</p></div>
+    <div class="email-ex-body">Hi [Agent Name],
+
+My name is [Your Name]. I&apos;m a [piano bar entertainer / guitar vocalist] looking for cruise ship contracts.
+
+Reel: [public YouTube link]
+Song list: attached
+Available from: [Month Year]
+
+[Optional] I don&apos;t yet have cruise ship experience, but I&apos;d welcome your guidance.
+
+[Your Name] &middot; [Phone] &middot; [Email]</div>
+    <div class="email-ex-tip">Honesty about experience level is completely fine &mdash; agents respect it. What they don&apos;t respect is vague or disorganised.</div>
+  </div>
+
+  <!-- Before You Hit Send -->
+  <div style="background:var(--w);border:2px solid var(--b);border-radius:8px;overflow:hidden;margin-bottom:24px;">
+    <div style="background:var(--p);padding:12px 18px;"><strong style="color:var(--w);font-size:14px;">&#10003; Before You Hit Send</strong></div>
+    <div style="padding:16px;" class="clist">
+      <label><input type="checkbox"> My YouTube link is PUBLIC or UNLISTED</label>
+      <label><input type="checkbox"> I&apos;m sending to ONE agent at a time (no CC)</label>
+      <label><input type="checkbox"> The agent&apos;s name is spelled correctly</label>
+      <label><input type="checkbox"> My position and availability are clearly stated</label>
+      <label><input type="checkbox"> My song list PDF opens and is readable on mobile</label>
+      <label><input type="checkbox"> My CV is one clean page</label>
+      <label><input type="checkbox"> I&apos;ve read this agency&apos;s page and know who they represent</label>
+      <label><input type="checkbox"> I would hire myself based on this email</label>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:14px;margin:28px 0;">
+    <div style="flex:1;height:1px;background:var(--b);"></div>
+    <span style="font-family:'Playfair Display',serif;font-size:15px;color:var(--tl);white-space:nowrap;">Your Email Templates</span>
+    <div style="flex:1;height:1px;background:var(--b);"></div>
+  </div>
+
+  <div id="tplContainer"></div>
+
+  <div class="btns">
+    <button class="btn btn-s" onclick="go(1)" style="flex:1;">&larr; Back</button>
+    <button class="btn btn-p" onclick="go(3)" style="flex:2;">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- S3: AGENT STRATEGY -->
+<div id="s3" class="card">
+  <h2>How to Choose a Trustworthy Agent</h2>
+  <p class="sub">Before you respond to any agent &mdash; understand commission, red flags, and the rules that protect you.</p>
+
+  <div class="grid2">
+    <div class="gbox gn"><strong>&#10003; Trust Signals &mdash; a good agent:</strong>
+      <ul><li>&#10003; 100% transparent about your salary AND commission</li><li>&#10003; Responsive and reachable</li><li>&#10003; Cares about your career goals</li><li>&#10003; Puts everything in writing</li><li>&#10003; Welcomes your questions</li></ul>
+    </div>
+    <div class="gbox red"><strong>&#128681; Red Flags &mdash; walk away if:</strong>
+      <ul><li>&#10007; &ldquo;We never take commission&rdquo; &mdash; this is a lie</li><li>&#10007; Vague terms or pressure to sign fast</li><li>&#10007; Slow or no communication</li><li>&#10007; &ldquo;Exclusivity forever&rdquo; with no clear terms</li><li>&#10007; Can&apos;t find any musicians they&apos;ve placed</li></ul>
+    </div>
+  </div>
+
+  <div class="ib-blue" style="margin-bottom:18px;">
+    <h4>How agent commission actually works</h4>
+    <p>Agents are paid by the cruise line, not directly by you &mdash; but you feel it in your salary. The line pays the agent (e.g. &euro;1,200/week) and the agent pays you less (e.g. &euro;800/week), keeping the difference. A transparent agent will tell you <strong>both numbers upfront</strong>. Industry standard for solo musicians is around <strong>15%</strong>. Hidden commission is unacceptable.</p>
+    <p style="margin-top:8px;font-style:italic;font-size:12px;">&ldquo;We don&apos;t charge commission&rdquo; is a lie &mdash; it just means the split is hidden. Always ask for both numbers.</p>
+  </div>
+
+  <div style="background:var(--w);border:2px solid var(--b);border-radius:8px;padding:18px;margin-bottom:18px;">
+    <strong style="font-size:13px;display:block;margin-bottom:12px;">&#9200; Agency vs. Direct: How long does it actually take?</strong>
+    <div class="grid2" style="margin-bottom:0;">
+      <div style="background:var(--pp);border-radius:6px;padding:14px;text-align:center;">
+        <div style="font-size:22px;font-weight:700;color:var(--p);">Sometimes ~2 weeks</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:4px;line-height:1.5;">Via a trusted agency<br><em>Can happen fast when a slot is available &mdash; but not a guarantee</em></div>
+      </div>
+      <div style="background:var(--bg);border-radius:6px;padding:14px;text-align:center;border:1px solid var(--b);">
+        <div style="font-size:22px;font-weight:700;color:var(--tl);">Months to years</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:4px;line-height:1.5;">Direct to a cruise line<br><em>Lines receive thousands of direct applications</em></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ib-warn ib" style="margin-bottom:18px;">
+    <h4 style="color:#92400e;">&#9888; The First-Submitter Rule &mdash; critical to understand</h4>
+    <p>Most cruise lines honour the <strong>first agent to submit a musician</strong> and ignore later submissions. If two agents submit you to the same line, there will be a dispute &mdash; and it damages your reputation with both.</p>
+    <p style="margin-top:8px;"><strong>The rule:</strong> Always tell each agent exactly which other agencies or cruise lines you have already been submitted to. Never let two agents unknowingly submit you to the same line.</p>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:12px;">&#10003; Vetting an Agent &mdash; Before You Sign Anything</h3>
+  <div class="clist">
+    <label><input type="checkbox"> I know my exact weekly salary AND the commission &mdash; both numbers</label>
+    <label><input type="checkbox"> I have everything in writing (commission, exclusivity if any)</label>
+    <label><input type="checkbox"> Any exclusivity clause has a clear end date and limited scope</label>
+    <label><input type="checkbox"> I have spoken with at least one musician who worked with this agent</label>
+    <label><input type="checkbox"> I have told this agent every other agency I&apos;ve already submitted to</label>
+    <label><input type="checkbox"> I can actually reach this agent &mdash; they respond in reasonable time</label>
+    <label><input type="checkbox"> This agent seems interested in my career, not just filling a vacancy</label>
+  </div>
+
+  <div class="btns">
+    <button class="btn btn-s" onclick="go(2)" style="flex:1;">&larr; Back</button>
+    <button class="btn btn-p" onclick="go(4)" style="flex:2;">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- S4: AGENCIES -->
+<div id="s4" class="card">
+  <h2>Agency Directory</h2>
+  <p class="sub">30 verified agencies and cruise lines. Start with the Priority agencies. Apply to as many as possible &mdash; 20 to 30 is a great goal.</p>
+
+  <div style="background:var(--w);border:2px solid var(--pl);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div>
+      <strong style="font-size:13px;display:block;margin-bottom:3px;">&#128202; Track your applications in Google Sheets</strong>
+      <p style="font-size:12px;color:var(--tm);">Keep this artifact open in one tab and the tracker open in another &mdash; the artifact is your guide, the sheet is where you log.</p>
+    </div>
+    <a href="https://docs.google.com/spreadsheets/d/1wPGWcDpnUOwxkEYRku_zyd_Yn6O5PgNs/edit?usp=sharing" target="_blank" class="abtn" style="flex-shrink:0;">Open Tracker &rarr;</a>
+  </div>
+
+  <!-- Agency vs Direct box -->
+  <div style="background:var(--pp);border:2px solid var(--pl);border-radius:8px;padding:22px;margin-bottom:22px;">
+    <h4 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:14px;">Before You Apply to Cruise Lines: Read This First</h4>
+    <div class="grid2">
+      <div class="gbox"><strong>&#128640; I want to get hired fast</strong><p>Prioritise agencies. They have existing relationships and can place you faster. <strong>Cost: 5&ndash;15% commission</strong> from your salary.</p></div>
+      <div class="gbox"><strong>&#128176; I want full salary + direct relationship</strong><p>Apply directly to cruise lines first. Slower, but you keep 100% of your earnings.</p></div>
+    </div>
+    <div class="ib-warn ib" style="margin:14px 0 14px;">
+      <h4 style="color:#92400e;font-size:13px;">The loyalty trap</h4>
+      <p>If a cruise line first hires you through an agency, they will associate you with that agency. Applying directly later means they&apos;ll refer you back to your agent. Your first contract sets the relationship &mdash; try direct first when possible.</p>
+    </div>
+    <div style="background:var(--w);border-radius:6px;padding:14px;border:1px solid var(--b);">
+      <strong style="font-size:13px;">&#10003; The practical approach</strong>
+      <p style="font-size:13px;color:var(--tm);margin-top:6px;line-height:1.6;">Apply to agencies <em>and</em> cruise lines at the same time. Try direct first for each cruise line. If an agency places you first &mdash; accept it. For your first contract, getting in quickly through an agent is often more valuable than waiting months.</p>
+    </div>
+  </div>
+
+  <div id="agencyDir"></div>
+
+  <div class="btns">
+    <button class="btn btn-s" onclick="go(3)" style="flex:1;">&larr; Back</button>
+    <button class="btn btn-p" onclick="go(5)" style="flex:2;">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- S5: FOLLOW-UPS -->
+<div id="s5" class="card">
+  <h2>How to Follow Up</h2>
+  <p class="sub">Most musicians never follow up. The ones who do stand out. Use these templates and set reminders.</p>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:19px;margin-bottom:16px;">Follow-Up Timeline</h3>
+  <div class="fu-step"><div class="fu-dot">14d</div><div class="fu-content"><h4>14 Days After Submission</h4><p>Send your first follow-up. Keep it brief and professional. Reference your original email and reiterate your availability.</p><button class="btn btn-s" style="margin-top:8px;font-size:12px;padding:6px 14px;" onclick="go(2)">Use Template 2</button></div></div>
+  <div class="fu-step"><div class="fu-dot">30d</div><div class="fu-content"><h4>30 Days After Submission</h4><p>Send one final follow-up. After this, move on &mdash; reapply in 3&ndash;4 months with updated materials.</p><button class="btn btn-s" style="margin-top:8px;font-size:12px;padding:6px 14px;" onclick="go(2)">Use Template 3</button></div></div>
+  <div class="fu-step"><div class="fu-dot">3mo</div><div class="fu-content"><h4>3&ndash;4 Months Later</h4><p>Reapply with fresh materials. Mention what has changed or improved since your last application.</p><button class="btn btn-s" style="margin-top:8px;font-size:12px;padding:6px 14px;" onclick="go(2)">Use Template 4</button></div></div>
+
+  <div class="cal-box">
+    <h4>Add These Reminders to Your Calendar</h4>
+    <div class="cal-item">&#128197; Day 0: &ldquo;Applied to [Agency Name]&rdquo; &mdash; note the date</div>
+    <div class="cal-item">&#128197; Day 14: &ldquo;Follow up with [Agency Name]&rdquo; &mdash; Template 2</div>
+    <div class="cal-item">&#128197; Day 30: &ldquo;Final follow-up with [Agency Name]&rdquo; &mdash; Template 3</div>
+    <div class="cal-item">&#128197; Day 90: &ldquo;Consider reapplying to [Agency Name]&rdquo; &mdash; Template 4</div>
+    <div class="cal-item" style="border-color:#f59e0b;background:#fff9e6;">&#128276; Weekly: &ldquo;Check cruise line careers pages for musician openings&rdquo;</div>
+  </div>
+
+  <div style="background:var(--w);border:2px solid var(--b);border-radius:8px;padding:18px;margin-bottom:20px;">
+    <strong style="font-size:13px;display:block;margin-bottom:12px;">What to Track in Your Google Sheet</strong>
+    <div class="grid2" style="margin-bottom:0;">
+      <div class="gbox"><strong>Date Sent</strong><p>When you submitted</p></div>
+      <div class="gbox"><strong>Agency Name</strong><p>Full name of the agency</p></div>
+      <div class="gbox"><strong>Materials Sent</strong><p>Reel / Song List / CV</p></div>
+      <div class="gbox"><strong>Reply Received</strong><p>Date and summary</p></div>
+      <div class="gbox"><strong>Follow-Up 1 (Day 14)</strong><p>Date to send Template 2</p></div>
+      <div class="gbox"><strong>Follow-Up 2 (Day 30)</strong><p>Date to send Template 3</p></div>
+      <div class="gbox"><strong>Lines Submitted To</strong><p>For First-Submitter Rule</p></div>
+      <div class="gbox"><strong>Status / Notes</strong><p>Current state + next steps</p></div>
+    </div>
+  </div>
+
+  <div class="btns">
+    <button class="btn btn-s" onclick="go(4)" style="flex:1;">&larr; Back</button>
+    <button class="btn btn-p" onclick="go(6)" style="flex:2;">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- S6: DONE -->
+<div id="s6" class="card">
+  <h2>You&apos;re Ready</h2>
+  <p class="sub">Check everything off, download your summary, and you&apos;re done.</p>
+
+  <h3 style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--pl);">Completion Checklist</h3>
+  <div class="final-clist">
+    <label><input type="checkbox"> Downloaded my musician CV (Step 1)</label>
+    <label><input type="checkbox"> Watched the application strategy video (Step 2)</label>
+    <label><input type="checkbox"> Understood what makes a professional application (Step 2)</label>
+    <label><input type="checkbox"> Know the red flags and trust signals for agents (Step 3)</label>
+    <label><input type="checkbox"> Understand the First-Submitter Rule (Step 3)</label>
+    <label><input type="checkbox"> Applied to at least 5 agencies (Step 4)</label>
+    <label><input type="checkbox"> Opened the Google Sheets tracker (Step 4)</label>
+    <label><input type="checkbox"> Set my Day 14 and Day 30 follow-up calendar reminders (Step 5)</label>
+    <label><input type="checkbox"> Set a weekly reminder to check cruise line careers pages (Step 5)</label>
+  </div>
+
+  <button class="btn btn-p" onclick="dlSummary()" style="width:100%;margin-top:28px;">&#128229; Download My Summary</button>
+  <div class="btns" style="margin-top:12px;">
+    <button class="btn btn-s" onclick="go(5)" style="flex:1;">&larr; Back</button>
+    <button class="btn btn-p" onclick="window.open('https://payhip.com/dashboard','_blank')" style="flex:2;">&#8617; Back to Course</button>
+  </div>
+  <p style="font-size:11px;color:var(--tl);text-align:center;margin-top:10px;">Return to course dashboard</p>
+</div>
+
+</div><!-- /wrap -->
+<div class="autosave" id="autosave">Progress saved &#10003;</div>
+
+<script>
+var cur = 1, tot = 6;
+
+var AGENCIES = [
+  {id:1,name:"Egg Entertainment",url:"https://docs.google.com/forms/d/e/1FAIpQLSft4TnmwJmrs3_wglp3nIajyxE3LQJtvFrRCKUPwc4NwDNbmg/viewform",type:"Form",region:"UK / Global",note:"Lara personally worked with this agency. Great pay. Mention Lara in your application.",pri:true},
+  {id:2,name:"Sonic Artistes",url:"https://www.sonicartistes.com/apply-now",type:"Form",region:"Global",note:"Lara got her first 2 cruise contracts with them. Highly recommended.",pri:true},
+  {id:3,name:"Blackburn International",url:"https://airtable.com/appjTXpy6686109I5/pagaJRfST4Kpj3BtA/form",type:"Form",region:"UK / Global",note:"Well-known industry name. Lara worked with them personally. Strong connections to Cunard.",pri:true},
+  {id:4,name:"Lime Entertainment",url:"https://lime.inc/apply-now/",type:"Form",region:"Global",note:"One of the most active cruise entertainment agencies. Founded by musicians, for musicians."},
+  {id:5,name:"Rising Stars",url:"https://www.risingstars.com.ua/castings/solo-musicians.php",type:"Form",region:"Europe/Global",note:"Huge range of opportunities including cruise ships, hotels, and resorts."},
+  {id:6,name:"Premier Entertainment Intl",url:"https://share.hsforms.com/1HHyVnEmBSe-lRmNjq4a0UQ2unpa",type:"Form",region:"Global",note:"Cruise ship musician placements. Very supportive agency."},
+  {id:7,name:"TAEE",url:"https://excellententertainment.biz/seek-representation/",type:"Form",region:"UK/Global",note:"UK-based, very active in cruise castings."},
+  {id:8,name:"Landau Music",url:"https://www.landaumusic.com/apply/",type:"Form",region:"Global"},
+  {id:9,name:"Warshaw Entertainment",url:"https://www.warshawentertainment.com/apply",type:"Form",region:"USA/Global",note:"Major cruise and live entertainment agency."},
+  {id:10,name:"Selection Talent",url:"https://www.selectionie.com/careers",type:"Form",region:"Global"},
+  {id:11,name:"Artists Provider",url:"https://artistsprovider.com/forartists",type:"Form",region:"Global",note:"International cruise and hotel contracts worldwide."},
+  {id:12,name:"ADM Stars",url:"https://admstars.com/apply-now/",type:"Form",region:"Global",note:"Leading European river cruise agency."},
+  {id:13,name:"Suman Entertainment",url:"https://sumanent.com/apply.html",type:"Form",region:"Global"},
+  {id:14,name:"Sputy Entertainment",url:"https://www.sputyentertainment.com/apply",type:"Form",region:"Global"},
+  {id:15,name:"ProShip Entertainment",url:"https://docs.google.com/forms/d/e/1FAIpQLScpoGLQSgz62nhJh-E0Acyiff8DkIQMvYbRI6Pdae2vD7baXQ/viewform",type:"Form",region:"Global"},
+  {id:16,name:"33 Music Group",url:"https://33artists.com/apply",type:"Form",region:"Global"},
+  {id:17,name:"Oceans Entertainment",url:"mailto:oceansentertainmentmusician@gmail.com",type:"Email",region:"Global",note:"Official contact: oceansentertainmentmusician@gmail.com"},
+  {id:18,name:"RWS Global",url:"https://www.rwsglobal.com/auditions-gigs/musicians",type:"Form",region:"Global",note:"Handles Holland America among others."},
+  {id:19,name:"PEEL Talent",url:"https://www.peeltalent.com/auditions-vacancies/#apply",type:"Form",region:"Europe",note:"Active recruiter for MSC and European cruise lines."},
+  {id:20,name:"Royal Caribbean",url:"https://www.royalcaribbeanentertainment.com/livemusic/careers/",type:"Form",region:"Global",note:"Lara completed 3 contracts here. Soloists: email jcollinge@rccl.com + copy livemusic@rccl.com. Include reel, song list, CV."},
+  {id:21,name:"Celebrity Cruises",url:"https://forms.office.com/Pages/ResponsePage.aspx?id=uEOqHAm_tkibPL1aVv7AGXn7PWXcRItBiuOnNvIHTdFUOVVGQkkyTTkzODFZWkFWVTBZUFFWSlVBUC4u",type:"Form",region:"Global",note:"Contemporary luxury line. Jazz, rock classics, elegant performance."},
+  {id:22,name:"Carnival Cruise Line",url:"https://www.carnivalentertainment.com/opportunities/musicians-and-djs/solo-artists",type:"Form",region:"Global",note:"The Fun Ships. Piano bar is the heart of the ship. Humour and audience interaction highly valued.",contact:"Apply Online"},
+  {id:23,name:"MSC Cruises",url:"https://careers.msccruises.com/",type:"Check",region:"Global",note:"Huge fleet. Multilingual musicians valued. Check regularly for musician positions."},
+  {id:24,name:"Princess Cruises",url:"https://www.princesscruisesentertainment.com/auditions",type:"Check",region:"Global",note:"The Love Boat line. Piano bars, warm interaction, Broadway and pop classics."},
+  {id:25,name:"Holland America Line",url:"https://hollandamericagroup.pinpointhq.com/entertainment-performers-and-presenters-gigs",type:"Check",region:"Global",note:"Famous Billboard Onboard concept. Deep knowledge of pop hits from 1950s onwards essential."},
+  {id:26,name:"Cunard",url:"https://www.cunardcareers.co.uk/careers/entertainment/",type:"Check",region:"Global",note:"Ultra-formal British luxury. Technical excellence essential. Blackburn International gives faster placement."},
+  {id:27,name:"Viking Ocean & River",url:"https://www.vikingcareers.com/eu/en/entertainment-enrichment",type:"Check",region:"Global",note:"No casino, no children. 100% cultural focus. Elegant, low-key piano style. Passengers 60+."},
+  {id:28,name:"AmaWaterways",url:"https://www.amawaterways.com/eu/careers",type:"Check",region:"Europe/Global",note:"River cruises on Rhine and Danube. Better quality of life than large ocean ships."},
+  {id:29,name:"Uniworld",url:"https://uniworldgrcglobalrivercruises.applytojob.com/",type:"Check",region:"Europe/Global",note:"Ultra-luxury river cruises. Refined, elegant profile. Jazz/pop classics, sophisticated passengers."}
+];
+
+var TEMPLATES = [
+  {id:1,title:"Template 1 - Initial Application",subj:"[Position] | [X] Songs | [Your Name]",
+   body:"Hi [Agency Name],\n\nI'm a [your position] with [X] years of performance experience and a repertoire of [X] songs.\n\nMy materials:\n- Promo video: [YouTube link]\n- Song list (PDF): [link or attachment]\n- CV: [link or attachment]\n\nAvailable from: [Month/Year]\n\nI'd love to be considered for any upcoming opportunities.\n\nBest regards,\n[Your Name]\n[Email] \u00b7 [Phone]"},
+  {id:2,title:"Template 2 - 14-Day Follow-Up",subj:"Follow-up: Cruise Musician Application \u2014 [Your Name]",
+   body:"Hi [Agent/Contact Name],\n\nI hope you're well. I wanted to follow up on my application from [date]. I remain very interested in opportunities with your organisation.\n\nMy materials: [YouTube link] | Available from: [Month/Year]\n\nPlease let me know if you need anything else.\n\nBest regards,\n[Your Name]"},
+  {id:3,title:"Template 3 - 30-Day Follow-Up",subj:"Still Interested \u2014 Cruise Musician Application \u2014 [Your Name]",
+   body:"Hi [Agent/Contact Name],\n\nI'm following up once more on my application from [date]. I'm still very interested and wanted to make sure my materials are on file.\n\nAvailable from: [Month/Year]\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]"},
+  {id:4,title:"Template 4 - Reapplication (Every 3-4 Months)",subj:"Updated Materials \u2014 [Your Name] | Cruise Musician Application",
+   body:"Hi [Agent/Contact Name],\n\nI hope this finds you well. I'm reapplying with updated materials for your review.\n\nSince my last application, I've [expanded my repertoire / completed additional performance work / updated my video].\n\nMy current materials:\n- Promo video: [YouTube link]\n- Song list: [link]\n- CV: [link]\n\nAvailable from: [Month/Year]\n\nThank you for your time.\n\nBest regards,\n[Your Name]"}
+];
+
+function go(n) {
+  document.getElementById('s'+cur).classList.remove('active');
+  var stps = document.querySelectorAll('.step');
+  stps.forEach(function(s,i){
+    s.classList.remove('active','done');
+    if(i+1<n) s.classList.add('done');
+    else if(i+1===n) s.classList.add('active');
+  });
+  cur=n;
+  document.getElementById('s'+n).classList.add('active');
+  var pct = tot===1?0:((cur-1)/(tot-1))*100;
+  document.getElementById('lineFg').style.width=pct+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateContinueBtn(){
+  var btn=document.getElementById('s1Btn');
+  var chk=document.getElementById('folderChk').checked;
+  btn.disabled=!chk;
+  btn.style.opacity=chk?'1':'.4';
+  btn.style.cursor=chk?'pointer':'not-allowed';
+}
+
+function getCVData(){
+  var inst=Array.from(document.querySelectorAll('#instGrid input:checked')).map(function(i){return i.value;});
+  var other=document.getElementById('cvOther').value.trim();
+  if(other) inst.push(other);
+  return {
+    name:document.getElementById('cvName').value.trim(),
+    email:document.getElementById('cvEmail').value.trim(),
+    phone:document.getElementById('cvPhone').value.trim(),
+    loc:document.getElementById('cvLoc').value.trim(),
+    pos:document.getElementById('cvPos').value.trim(),
+    exp:document.getElementById('cvExp').value.trim(),
+    rep:document.getElementById('cvRep').value.trim(),
+    skills:document.getElementById('cvSkills').value.trim(),
+    inst:inst
+  };
+}
+
+function updateCV(){
+  var d=getCVData();
+  var p=document.getElementById('cvPreview');
+  var html='<div class="cv-name">'+(d.name||'Your Name')+'</div>';
+  html+='<div class="cv-pos">'+(d.pos||'Musician')+'</div>';
+  var ct=[d.email,d.phone,d.loc].filter(Boolean).join(' \u00b7 ');
+  html+='<div class="cv-contact">'+(ct||'email \u00b7 phone \u00b7 location')+'</div>';
+  if(d.exp) html+='<div class="cv-sec"><div class="cv-sec-lbl">Experience</div><div class="cv-sec-txt">'+d.exp.split('\n').join('<br>')+'</div></div>';
+  if(d.inst.length) html+='<div class="cv-sec"><div class="cv-sec-lbl">Instruments</div><div class="cv-sec-txt">'+d.inst.join(', ')+'</div></div>';
+  if(d.rep) html+='<div class="cv-sec"><div class="cv-sec-lbl">Repertoire</div><div class="cv-sec-txt">'+d.rep+' songs performance-ready</div></div>';
+  if(d.skills) html+='<div class="cv-sec"><div class="cv-sec-lbl">Special Skills</div><div class="cv-sec-txt">'+d.skills+'</div></div>';
+  p.innerHTML=html;
+}
+
+function dlCV(){
+  var d=getCVData();
+  var ct=[d.email,d.phone,d.loc].filter(Boolean).join(' \u00b7 ');
+  var css='<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,sans-serif;background:#fff;color:#222;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.cv{max-width:680px;margin:0 auto;padding:48px 40px;}.cv-name{font-family:"Playfair Display",serif;font-size:26px;font-weight:700;margin-bottom:4px;}.cv-pos{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}.cv-contact{font-size:11px;color:#777;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #222;}.sec{margin-top:16px;}.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a1a1a;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #ddd;}.sec-txt{font-size:13px;color:#444;line-height:1.6;}.note{font-size:10px;color:#aaa;margin-top:24px;font-style:italic;text-align:center;}@media print{.cv{padding:20px;}}</style>';
+  var body='<div class="cv"><div class="cv-name">'+(d.name||'Your Name')+'</div><div class="cv-pos">'+(d.pos||'Musician')+'</div><div class="cv-contact">'+(ct||'email \u00b7 phone \u00b7 location')+'</div>';
+  if(d.exp) body+='<div class="sec"><div class="sec-lbl">Experience</div><div class="sec-txt">'+d.exp.split('\n').join('<br>')+'</div></div>';
+  if(d.inst.length) body+='<div class="sec"><div class="sec-lbl">Instruments</div><div class="sec-txt">'+d.inst.join(', ')+'</div></div>';
+  if(d.rep) body+='<div class="sec"><div class="sec-lbl">Repertoire</div><div class="sec-txt">'+d.rep+' songs performance-ready</div></div>';
+  if(d.skills) body+='<div class="sec"><div class="sec-lbl">Special Skills</div><div class="sec-txt">'+d.skills+'</div></div>';
+  body+='<div class="note">Available for cruise ship contracts \u2014 please contact me to discuss opportunities.</div></div>';
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">'+css+'</head><body>'+body+'</body></html>';
+  openPrint(html);
+}
+
+function dlSummary(){
+  var d=getCVData();
+  var dt=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var clist=[];
+  document.querySelectorAll('.final-clist label').forEach(function(l){
+    var cb=l.querySelector('input');
+    if(cb) clist.push({ok:cb.checked,txt:l.textContent.trim()});
+  });
+  function crow(ok,txt){return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:6px;margin-bottom:5px;background:'+(ok?'#f0f7fa':'#f8f9fa')+';border:1px solid '+(ok?'#d4e8f0':'#e5e7eb')+';font-size:13px;color:#4b5563;"><div style="width:17px;height:17px;border-radius:3px;flex-shrink:0;border:2px solid '+(ok?'#7ab8d9':'#d4e8f0')+';background:'+(ok?'#7ab8d9':'#fff')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-top:1px;">'+(ok?'&#10003;':'')+'</div><span>'+txt+'</span></div>';}
+  var profile='';
+  function pr(l,v){if(!v)return '';return '<div style="display:flex;gap:10px;padding:7px 12px;border-radius:5px;margin-bottom:5px;background:#f8f9fa;border:1px solid #e5e7eb;font-size:13px;"><b style="min-width:100px;color:#6b7280;font-size:11px;text-transform:uppercase;padding-top:2px;">'+l+'</b><span>'+v+'</span></div>';}
+  profile+=pr('Name',d.name)+pr('Position',d.pos)+pr('Email',d.email)+pr('Phone',d.phone)+pr('Location',d.loc)+pr('Instruments',d.inst.join(', '))+pr('Repertoire',d.rep?d.rep+' songs':'')+pr('Skills',d.skills);
+  var cl=''; clist.forEach(function(i){cl+=crow(i.ok,i.txt);});
+  var ns=[
+    'Open the Google Sheets tracker and set up your columns',
+    'Apply to the 3 priority agencies first: Egg, Sonic Artistes, Blackburn',
+    'Log every submission: date sent, materials, follow-up dates',
+    'Work through remaining agencies \u2014 cast a wide net',
+    'Set calendar reminders for Day 14 and Day 30 follow-ups',
+    'Check cruise line careers pages weekly for musician openings'
+  ];
+  var nshtml=''; ns.forEach(function(s){nshtml+=crow(false,s);});
+  var css='<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Inter,sans-serif;background:#f8f9fa;color:#2c3e50;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.pg{max-width:750px;margin:0 auto;padding:0 0 60px;}.hdr{background:#7ab8d9;color:#fff;padding:36px 40px 28px;text-align:center;}.lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85;margin-bottom:8px;}.hdr h1{font-family:"Playfair Display",serif;font-size:30px;font-weight:700;margin-bottom:6px;}.sub{font-size:13px;opacity:.9;}.dt{font-size:11px;opacity:.75;margin-top:8px;}.sec{background:#fff;margin:16px 40px 0;border-radius:10px;padding:22px;border:1px solid #e5e7eb;}.sh{font-family:"Playfair Display",serif;font-size:17px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #d4e8f0;display:flex;align-items:center;gap:8px;}.dot{width:8px;height:8px;border-radius:50%;background:#7ab8d9;flex-shrink:0;}.nsh{background:#7ab8d9;color:#fff;padding:12px 22px;margin:16px 40px 0;border-radius:10px 10px 0 0;}.nsh h2{font-family:"Playfair Display",serif;font-size:17px;font-weight:600;}.nsb{background:#fff;margin:0 40px;border-radius:0 0 10px 10px;padding:18px 22px;border:1px solid #d4e8f0;border-top:none;}.ftr{background:#7ab8d9;color:#fff;padding:12px 40px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;}.ftr span{font-size:11px;opacity:.9;}@media print{body{background:#fff;}.pg{max-width:100%;}}</style>';
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'+css+'</head><body><div class="pg"><div class="hdr"><div class="lbl">The International Musician</div><h1>Module 4: The Application Process</h1><div class="sub">How to Become a Cruise Ship Musician \u2014 Lara Bruyelles</div><div class="dt">Generated '+dt+'</div></div><div class="sec"><div class="sh"><div class="dot"></div>Your Musician Profile</div>'+profile+'</div><div class="sec"><div class="sh"><div class="dot"></div>Completion Checklist</div>'+cl+'</div><div class="nsh"><h2>&#10003; Next Steps</h2></div><div class="nsb">'+nshtml+'</div><div class="ftr"><span>The International Musician \u00b7 Lara Bruyelles</span><span>Module 4: The Application Process</span></div></div></body></html>';
+  openPrint(html);
+}
+
+function openPrint(html){
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var win=window.open(url,'_blank');
+  if(win){win.onload=function(){setTimeout(function(){win.print();},400);};}
+  else{var a=document.createElement('a');a.href=url;a.target='_blank';document.body.appendChild(a);a.click();document.body.removeChild(a);}
+  setTimeout(function(){URL.revokeObjectURL(url);},30000);
+}
+
+function renderTemplates(){
+  var c=document.getElementById('tplContainer');
+  c.innerHTML=TEMPLATES.map(function(t){
+    return '<div class="tcard"><div class="tcard-hdr"><h3>'+t.title+'</h3><button class="copy-btn" id="cb'+t.id+'" onclick="copyTpl('+t.id+')">Copy</button></div><div class="tcard-subj"><strong>Subject:</strong> '+t.subj+'</div><div class="tcard-body">'+t.body+'</div><div class="tcard-tip">Replace all text in [brackets] with your information</div></div>';
+  }).join('');
+}
+
+function copyTpl(id){
+  var t=TEMPLATES.find(function(x){return x.id===id;});
+  if(!t) return;
+  navigator.clipboard.writeText('Subject: '+t.subj+'\n\n'+t.body).then(function(){
+    var btn=document.getElementById('cb'+id);
+    btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent='Copy';},2000);
+  });
+}
+
+function renderAgencies(){
+  var secs=[
+    {label:'Priority Agencies \u2014 Start Here',filter:function(a){return a.pri;}},
+    {label:'Established Agencies',filter:function(a){return !a.pri&&a.id<=17;}},
+    {label:'Recruitment Specialists',filter:function(a){return a.id>=18&&a.id<=19;}},
+    {label:'Cruise Lines \u2014 Check for Positions or Apply Online',filter:function(a){return a.id>=20;}}
+  ];
+  var html='';
+  secs.forEach(function(sec){
+    html+='<div class="agent-sec-ttl">'+sec.label+'</div>';
+    AGENCIES.filter(sec.filter).forEach(function(ag){
+      var btnCls=ag.type==='Check'?'abtn chk':'abtn';
+      var btnTxt=ag.type==='Email'?'Email':ag.type==='Check'?'Check Jobs':'Apply';
+      html+='<div class="acard'+(ag.pri?' pri':'')+'"><div class="acard-info"><div class="acard-name">'+ag.name+(ag.pri?'<span class="badge">Priority</span>':'')+'</div>'+(ag.note?'<div class="acard-note">'+ag.note+'</div>':'')+'<div class="atags"><span class="atag">'+ag.region+'</span><span class="atag">'+(ag.contact||ag.type)+'</span></div></div><a href="'+ag.url+'" target="_blank" rel="noopener" class="'+btnCls+'">'+btnTxt+'</a></div>';
+    });
+  });
+  document.getElementById('agencyDir').innerHTML=html;
+}
+
+function save(){
+  try{
+    var d=getCVData();
+    localStorage.setItem('m4cv',JSON.stringify(d));
+    var el=document.getElementById('autosave');
+    el.classList.add('show');
+    setTimeout(function(){el.classList.remove('show');},2000);
+  }catch(e){}
+}
+
+function load(){
+  try{
+    var raw=localStorage.getItem('m4cv');
+    if(!raw) return;
+    var d=JSON.parse(raw);
+    if(d.name) document.getElementById('cvName').value=d.name;
+    if(d.email) document.getElementById('cvEmail').value=d.email;
+    if(d.phone) document.getElementById('cvPhone').value=d.phone;
+    if(d.loc) document.getElementById('cvLoc').value=d.loc;
+    if(d.pos) document.getElementById('cvPos').value=d.pos;
+    if(d.exp) document.getElementById('cvExp').value=d.exp;
+    if(d.rep) document.getElementById('cvRep').value=d.rep;
+    if(d.skills) document.getElementById('cvSkills').value=d.skills;
+    if(d.inst) document.querySelectorAll('#instGrid input').forEach(function(inp){inp.checked=d.inst.indexOf(inp.value)>-1;});
+    updateCV();
+  }catch(e){}
+}
+
+renderTemplates();
+renderAgencies();
+load();
+</script>
+</body>
+</html>
