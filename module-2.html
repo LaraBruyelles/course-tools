@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 2: Song Learning Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #7ab8d9;
+            --primary-light: #d4e8f0;
+            --primary-lighter: #f0f7fa;
+            --text-dark: #2c3e50;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --background: #f8f9fa;
+            --white: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        /* PROGRESS STEPS */
+        .progress-container {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .progress-line-active {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            height: 2px;
+            background: var(--primary);
+            z-index: 1;
+            transition: width 0.3s ease;
+        }
+
+        .progress-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .progress-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 2px solid var(--border);
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step:hover .progress-circle {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .progress-step.active .progress-circle,
+        .progress-step.completed .progress-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .progress-step.active .progress-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* SECTION CARD */
+        .section-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .section-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-medium);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* BUTTONS */
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #6aa7c8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(122, 184, 217, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        /* EDIT TIMELINE BUTTON */
+        .edit-timeline-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+            transition: all 0.3s ease;
+            display: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .edit-timeline-btn.show {
+            display: block;
+        }
+
+        .edit-timeline-btn:hover {
+            background: #6aa7c8;
+            transform: translateY(-2px);
+        }
+
+        /* AUTO-SAVE INDICATOR */
+        .auto-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(122, 184, 217, 0.3);
+            z-index: 1000;
+        }
+
+        .auto-save.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* FORM ELEMENTS */
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-top: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+            margin-top: 16px;
+        }
+
+        /* UPLOAD AREA */
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: var(--primary-lighter);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 24px 0;
+        }
+
+        .upload-area:hover {
+            border-color: #6aa7c8;
+            background: var(--primary-light);
+        }
+
+        .upload-area.dragover {
+            border-color: #6aa7c8;
+            background: var(--primary-light);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            pointer-events: none;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: var(--text-dark);
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 8px;
+            pointer-events: none;
+        }
+
+        .status {
+            margin-top: 16px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status.success {
+            color: #10b981;
+        }
+
+        .status.error {
+            color: #ef4444;
+        }
+
+        /* INFO BOXES */
+        .info-box {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-box h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: var(--text-medium);
+            line-height: 1.6;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: var(--primary-lighter);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* PROGRESS BAR */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 24px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* CHECKLIST */
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        .genre-section {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .genre-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .song-item:last-child {
+            border-bottom: none;
+        }
+
+        .song-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .song-artist {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* VIDEO CONTAINER */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 24px 0;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* DOWNLOAD BUTTONS */
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .download-buttons button {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .section-card {
+                padding: 24px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .btn {
+                width: 100%;
+            }
+
+            .edit-timeline-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .checklist-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="edit-timeline-btn" id="editTimelineBtn" onclick="goToSection(3)">📝 Edit Timeline</button>
+    <div class="auto-save" id="autoSave">Progress saved ✓</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Module 2: Song Learning Manager</h1>
+            <p>Build your cruise ship repertoire strategically</p>
+        </div>
+
+        <!-- PROGRESS STEPS -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line"></div>
+                <div class="progress-line-active" id="progressLineActive"></div>
+
+                <div class="progress-step active" data-section="0" onclick="goToSection(0)">
+                    <div class="progress-circle">1</div>
+                    <div class="progress-label">Your List</div>
+                </div>
+                <div class="progress-step" data-section="1" onclick="goToSection(1)">
+                    <div class="progress-circle">2</div>
+                    <div class="progress-label">Upload</div>
+                </div>
+                <div class="progress-step" data-section="2" onclick="goToSection(2)">
+                    <div class="progress-circle">3</div>
+                    <div class="progress-label">Video</div>
+                </div>
+                <div class="progress-step" data-section="3" onclick="goToSection(3)">
+                    <div class="progress-circle">4</div>
+                    <div class="progress-label">Timeline</div>
+                </div>
+                <div class="progress-step" data-section="4" onclick="goToSection(4)">
+                    <div class="progress-circle">5</div>
+                    <div class="progress-label">Checklist</div>
+                </div>
+                <div class="progress-step" data-section="5" onclick="goToSection(5)">
+                    <div class="progress-circle">6</div>
+                    <div class="progress-label">Interactive</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 0: BEFORE YOU BUILD YOUR LIST -->
+        <div class="section-card active" id="section0">
+            <h2 class="section-title">Before You Build Your List</h2>
+            <p class="section-subtitle">Most musicians jump straight to learning songs. The ones who get hired ask better questions first. This takes 10 minutes and will save you months of learning the wrong material.</p>
+
+            <!-- THE INTERNATIONAL TEST -->
+            <div style="background: var(--primary-light); padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; color: var(--text-dark);">🌍 The International Recognition Test</h3>
+                <p style="font-size: 15px; color: var(--text-medium); line-height: 1.7; margin-bottom: 16px;">Your audience comes from dozens of countries — Japan, Germany, the US, Australia, Brazil — all in the same room. A French chanson or a national hit that your home country loves is a risk unless the line specifically targets that market.</p>
+                <div style="background: var(--white); padding: 20px; border-radius: 8px; border: 2px solid var(--primary-light);">
+                    <p style="font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 12px;">For every song on your list, ask yourself:</p>
+                    <p style="font-size: 16px; color: var(--primary); font-style: italic; line-height: 1.8; text-align: center; font-weight: 600;">"Would a passenger from Japan, Germany, and the USA all potentially recognise this song?"</p>
+                    <p style="font-size: 13px; color: var(--text-light); margin-top: 12px; text-align: center;">If the answer is no — or maybe — it probably shouldn't be in your core repertoire.</p>
+                </div>
+            </div>
+
+            <!-- GENRE DISTRIBUTION -->
+            <div style="background: var(--white); padding: 24px; border-radius: 8px; margin-bottom: 24px; border: 2px solid var(--border);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; color: var(--text-dark);">🎼 Genre Distribution</h3>
+                <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 20px; line-height: 1.6;">Agents and cruise directors want range. Piano bar performers who can span jazz to modern pop in a single set are <strong>significantly more bookable</strong>. Use this as a starting target:</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                    <div style="text-align: center; padding: 16px; background: var(--primary-lighter); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary);">30%</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">Pop</div>
+                        <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Timeless & current</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--primary-lighter); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary);">20%</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">Rock</div>
+                        <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Classic anthems</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--primary-lighter); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary);">20%</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">Standards</div>
+                        <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Oldies & Motown</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--primary-lighter); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary);">15%</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">Jazz</div>
+                        <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Lounge & swing</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: var(--primary-lighter); border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary);">15%</div>
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 4px;">Flex</div>
+                        <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Film, musicals, current</div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: var(--text-light); font-style: italic;">These are targets, not rigid rules. But if your list is 80% one genre, that's worth addressing before you apply.</p>
+            </div>
+
+            <!-- SKILL GAP CHECK -->
+            <div style="background: var(--white); padding: 24px; border-radius: 8px; margin-bottom: 24px; border: 2px solid var(--border);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; color: var(--text-dark);">🔍 Honest Skill Check</h3>
+                <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 20px; line-height: 1.6;">"The best musicians on our books were not ready when they came to us." The ones who improve fastest know what they need to work on. Tick anything that applies — be honest:</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--primary-lighter); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" onchange="saveSkillGaps()" id="gap_range" style="margin-top: 3px; accent-color: var(--primary);">
+                        <div><strong style="font-size: 14px; color: var(--text-dark);">My vocal range is limited</strong> — I avoid songs that sit too high or too low<br><span style="font-size: 12px; color: var(--text-light);">Note where the gaps are. Transposing keys is often the practical fix.</span></div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--primary-lighter); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" onchange="saveSkillGaps()" id="gap_genre" style="margin-top: 3px; accent-color: var(--primary);">
+                        <div><strong style="font-size: 14px; color: var(--text-dark);">I'm weak in a required genre</strong> — e.g. few jazz standards or little current pop<br><span style="font-size: 12px; color: var(--text-light);">Prioritise that genre in your learning plan. Even 10 strong songs in a weak area makes a difference.</span></div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--primary-lighter); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" onchange="saveSkillGaps()" id="gap_repertoire" style="margin-top: 3px; accent-color: var(--primary);">
+                        <div><strong style="font-size: 14px; color: var(--text-dark);">My total repertoire is small</strong> — under 40 songs I can confidently perform<br><span style="font-size: 12px; color: var(--text-light);">A 3-hour lounge set needs 40–50 songs minimum. That's what this module is for.</span></div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--primary-lighter); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" onchange="saveSkillGaps()" id="gap_classical" style="margin-top: 3px; accent-color: var(--primary);">
+                        <div><strong style="font-size: 14px; color: var(--text-dark);">My background is classical — I need to develop more accessible popular material</strong><br><span style="font-size: 12px; color: var(--text-light);">Very common and very fixable, but it takes time. Six weeks may not be enough — be realistic about your timeline.</span></div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--primary-lighter); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" onchange="saveSkillGaps()" id="gap_banter" style="margin-top: 3px; accent-color: var(--primary);">
+                        <div><strong style="font-size: 14px; color: var(--text-dark);">I struggle with banter and crowd interaction</strong> — I tend to just play<br><span style="font-size: 12px; color: var(--text-light);">For lounge/bar positions this is a real gap. The interactive sets section later in this module will help.</span></div>
+                    </label>
+                </div>
+                <div id="skillGapNote" style="display: none; margin-top: 16px; padding: 14px; background: var(--primary-light); border-radius: 8px; font-size: 14px; color: var(--text-dark); line-height: 1.6;">
+                    💡 <strong>Good — you're being honest with yourself.</strong> Keep these gaps in mind as you build your list. If you want structured help working through them, that's exactly what <strong>1:1 coaching</strong> is for.
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToSection(1)">I'm ready — let's build my list →</button>
+            </div>
+        </div>
+
+        <!-- SECTION 0: UPLOAD -->
+        <div class="section-card" id="section1">
+            <h2 class="section-title">Upload Your Master Song List</h2>
+            <p class="section-subtitle">Mark the songs you want to learn with an X in the checkbox column, then upload your file.</p>
+
+            <!-- LOOM VIDEO: How to use the Master Song List -->
+            <div style="margin-bottom: 28px;">
+                <p style="font-size: 14px; font-weight: 600; color: var(--text-medium); margin-bottom: 12px;">🎥 Watch this first — I'll walk you through the whole process:</p>
+                <div class="video-container">
+                    <iframe src="https://www.loom.com/embed/83d2c669098743c894c69f2c9e9202fa" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-bottom: 24px;">
+                <h3>📋 Step-by-step: how to prepare your file</h3>
+                <ol style="margin-left: 20px; color: var(--text-medium); font-size: 14px; line-height: 2.2;">
+                    <li><strong>Open the Master Song List</strong> → <a href="https://docs.google.com/spreadsheets/d/1Rd-2UXecWpl2IeZsFuhtJIVd6zQeuM7i/edit?usp=sharing&ouid=105222543999188564788&rtpof=true&sd=true" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Click here to access it ↗</a></li>
+                    <li><strong>Make your own copy</strong> — File → Make a copy (so you can edit it)</li>
+                    <li><strong>Mark songs you want to learn</strong> by writing an <strong>X</strong> in the correct column:
+                        <ul style="margin-left: 20px; margin-top: 8px; margin-bottom: 8px;">
+                            <li><strong>Universal Sing-Along / Crowd Pleasers tab:</strong> Column D</li>
+                            <li><strong>Piano Essentials tab:</strong> Column G</li>
+                            <li><strong>Guitar Essentials tab:</strong> Column G</li>
+                        </ul>
+                    </li>
+                    <li><strong>Add songs you already know</strong> at the very bottom of the relevant tab — write the song title and artist, then put an X in the correct column</li>
+                    <li><strong>Download as Excel</strong> — File → Download → Microsoft Excel (.xlsx)</li>
+                    <li><strong>Upload it below</strong> ↓</li>
+                </ol>
+            </div>
+
+            <div class="upload-area" id="uploadArea"
+                onclick="document.getElementById('fileInput').click()"
+                ondragover="event.preventDefault(); this.classList.add('dragover')"
+                ondragleave="event.preventDefault(); this.classList.remove('dragover')"
+                ondrop="event.preventDefault(); this.classList.remove('dragover'); if(event.dataTransfer.files[0]) handleFile(event.dataTransfer.files[0])">
+                <div class="upload-icon" style="pointer-events:none">📂</div>
+                <div class="upload-text" style="pointer-events:none">Click to upload or drag your file here</div>
+                <div class="upload-subtext" style="pointer-events:none">.xlsx or .xls files only</div>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0]) handleFile(this.files[0])" />
+            </div>
+            <div class="status" id="status"></div>
+
+            <!-- SUMMARY SECTION -->
+            <div id="summarySection" style="display: none; margin-top: 32px;">
+                <div class="info-box">
+                    <h3>📊 Your Song List</h3>
+                    <label class="form-label">Total songs:</label>
+                    <input type="number" id="totalSongsEdit" min="0" value="0" onchange="updateSongsToLearn()">
+
+                    <label class="form-label">Songs you already know:</label>
+                    <input type="number" id="songsKnownEdit" min="0" value="0" onchange="updateSongsToLearn()">
+
+                    <p style="margin-top: 16px; font-size: 16px; color: var(--text-dark);"><strong>Songs to learn:</strong> <span id="songsToLearnDisplay" style="color: var(--primary); font-size: 20px;">0</span></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToSection(0)">← Back</button>
+                <button class="btn btn-primary" onclick="goToSection(2)">Continue to Video →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: VIDEO -->
+        <div class="section-card" id="section2">
+            <h2 class="section-title">How to Learn Songs for Cruise Ships</h2>
+            <p class="section-subtitle">Watch this video to learn the proven strategy for learning songs quickly and effectively.</p>
+
+            <div class="video-container" id="ytFacade" onclick="
+                var v = document.getElementById('ytFacade');
+                v.innerHTML = '<iframe src=\'https://www.youtube.com/embed/w5vj2JjCWxY?autoplay=1&rel=0\' title=\'YouTube video player\' frameborder=\'0\' allow=\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\' allowfullscreen style=\'position:absolute;top:0;left:0;width:100%;height:100%;border:none;\'></iframe>';
+                v.style.cursor = 'default';
+            " style="cursor:pointer; background:#000;">
+                <img src="https://i.ytimg.com/vi/w5vj2JjCWxY/maxresdefault.jpg"
+                     onerror="this.src='https://i.ytimg.com/vi/w5vj2JjCWxY/hqdefault.jpg'"
+                     style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" alt="How to Learn Songs for Cruise Ships">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;background:#ff0000;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <div style="width:0;height:0;border-style:solid;border-width:11px 0 11px 22px;border-color:transparent transparent transparent #fff;margin-left:4px;"></div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(1)">← Back</button>
+                <button class="btn btn-primary" onclick="goToSection(3)">Continue to Timeline →</button>
+            </div>
+        </div>
+
+        <!-- SECTION 2: TIMELINE -->
+        <div class="section-card" id="section3">
+            <h2 class="section-title">Your Learning Pace</h2>
+            <p class="section-subtitle">How many songs do you need to learn, and how much time do you have? Set your timeline below and we'll break it down into a weekly target you can actually commit to.</p>
+
+            <div class="info-box">
+                <label class="form-label">Timeline (months):</label>
+                <input type="number" id="timelineInput" min="1" value="6" onchange="recalculatePace()">
+
+                <div id="paceInfo" style="margin-top: 24px;">
+                    <p style="font-size: 16px; margin-bottom: 12px; color: var(--text-medium);">You have <strong style="color: var(--primary); font-size: 18px;" id="totalWeeks">24</strong> weeks to learn <strong style="color: var(--primary); font-size: 18px;" id="songsToLearnInfo">0</strong> songs.</p>
+                    <p style="font-size: 16px; color: var(--text-medium);">That's <strong style="color: var(--primary); font-size: 18px;" id="songsPerWeekInfo">0</strong> songs per week.</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(2)">← Back</button>
+                <button class="btn btn-primary" onclick="commitToTimeline()">Yes, I commit →</button>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CHECKLIST -->
+        <div class="section-card" id="section4">
+            <h2 class="section-title">Your Learning Checklist</h2>
+            <p class="section-subtitle">Check off songs as you learn them. Progress is saved automatically to this browser — if you clear your browser cache or history, progress will be lost, so download your summary regularly.</p>
+
+            <div class="stats-grid" id="statsContainer"></div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+            <input type="text" id="searchSongs" placeholder="🔍 Search songs..." onkeyup="filterSongs()" style="margin-bottom: 24px;">
+
+            <div class="checklist-grid" id="checklistContainer"></div>
+
+            <!-- CALENDAR TASKS -->
+            <div style="margin-top: 32px; padding: 24px; background: var(--white); border-radius: 8px; border: 2px solid var(--border);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text-dark);">📅 Add These to Your Calendar</h3>
+                <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 16px; line-height: 1.6;">Add these weekly tasks to your personal calendar (Google Calendar, Apple Calendar, etc.) to stay on track.</p>
+                <div id="calendarTasksList" style="font-size: 14px; color: var(--text-medium); line-height: 2;"></div>
+            </div>
+
+            <!-- DOWNLOAD -->
+            <div style="margin-top: 24px; padding: 24px; background: var(--primary-lighter); border-radius: 8px; border: 1px solid var(--border);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text-dark);">🎵 Download Your Song List</h3>
+                <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 16px;">Professional format — ready to send directly to cruise line agents.</p>
+                <div class="download-buttons">
+                    <button class="btn btn-primary" onclick="downloadSongListPDF()">🎵 Download My Song List (PDF)</button>
+                </div>
+            </div>
+
+            <!-- MANDATORY CHECKBOX -->
+            <div id="promoFolderBox" style="margin-top: 16px; padding: 20px; background: var(--white); border-radius: 8px; border: 2px solid var(--border); transition: border-color 0.3s;">
+                <label style="display: flex; align-items: flex-start; gap: 14px; cursor: pointer;">
+                    <input type="checkbox" id="promoFolderCheck" onchange="toggleContinueBtn()" style="margin-top: 3px; accent-color: var(--primary); width: 18px; height: 18px; flex-shrink: 0; cursor: pointer;">
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px; color: var(--text-dark); margin-bottom: 4px;">I have saved this PDF to my "Promo Materials — Ready to Send" folder</div>
+                        <div style="font-size: 13px; color: var(--text-light); line-height: 1.5;">If you haven't created this folder yet, do it now — you'll add your showreel, bio, and photo there too. Having everything in one place means you can apply to an agent in under 5 minutes.</div>
+                    </div>
+                </label>
+            </div>
+            <div id="promoFolderWarning" style="display: none; margin-top: 8px; font-size: 13px; color: #e57373; padding-left: 4px;">⚠️ Please tick the box above before continuing.</div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToSection(3)">← Edit Timeline</button>
+                <button class="btn btn-primary" id="continueToInteractive" onclick="checkPromoFolder()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- SECTION 4: INTERACTIVE SETS -->
+        <div class="section-card" id="section5">
+            <h2 class="section-title">Beyond the Songs: Interactive Sets That Get You Re-Booked</h2>
+            <p class="section-subtitle">Sourced directly from a major cruise agency — this is the differentiator most musicians ignore.</p>
+
+            <!-- WHY IT MATTERS -->
+            <div style="background: var(--primary-light); padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid var(--primary);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 12px; color: var(--text-dark);">🚢 Why This Matters</h3>
+                <p style="font-size: 15px; color: var(--text-medium); line-height: 1.8; margin-bottom: 12px;">
+                    World cruises and long itineraries can have <strong>10–12 sea days in a single two-week voyage</strong>. That's a lot of time to fill — and Cruise Directors are actively looking for musicians who can do more than just perform.
+                </p>
+                <p style="font-size: 15px; color: var(--text-medium); line-height: 1.8; margin-bottom: 12px;">
+                    A musician who can run an <strong>interactive set makes the CD's life easier</strong>, fills programming gaps effortlessly, and becomes someone they want to re-book. It's one of the most reliable ways to go from a one-contract hire to a recurring artist.
+                </p>
+                <p style="font-size: 15px; color: var(--text-medium); line-height: 1.8;">
+                    🌍 <strong>Bonus: it works brilliantly for international audiences.</strong> When half your crowd's first language isn't English, a sing-along or name-that-tune doesn't need perfect verbal communication — the music does the work.
+                </p>
+            </div>
+
+            <!-- THE FORMATS -->
+            <div style="background: var(--white); padding: 24px; border-radius: 8px; margin-bottom: 24px; border: 2px solid var(--border);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 20px; color: var(--text-dark);">🎹 The Formats to Prepare</h3>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                    <div style="background: var(--primary-lighter); padding: 20px; border-radius: 8px; border-top: 3px solid var(--primary);">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎵</div>
+                        <div style="font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 8px;">Name That Tune</div>
+                        <p style="font-size: 13px; color: var(--text-medium); line-height: 1.6;">Play the intro of a recognisable song and let the audience guess. Works for all ages, all nationalities. Keep a list of 30–50 crowd-pleasers ready.</p>
+                    </div>
+                    <div style="background: var(--primary-lighter); padding: 20px; border-radius: 8px; border-top: 3px solid var(--primary);">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎲</div>
+                        <div style="font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 8px;">Musical Bingo</div>
+                        <p style="font-size: 13px; color: var(--text-medium); line-height: 1.6;">Passengers get bingo cards with song titles. You play the intros — they mark them off. Simple, hilarious, and completely repeatable with different card sets.</p>
+                    </div>
+                    <div style="background: var(--primary-lighter); padding: 20px; border-radius: 8px; border-top: 3px solid var(--primary);">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎤</div>
+                        <div style="font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 8px;">Trivia & Quiz Sets</div>
+                        <p style="font-size: 13px; color: var(--text-medium); line-height: 1.6;">You play live while hosting a music trivia quiz — who sang this? What year? Name the film. The piano makes every answer more dramatic. Works well for themed evenings (Motown, 80s, film music).</p>
+                    </div>
+                    <div style="background: var(--primary-lighter); padding: 20px; border-radius: 8px; border-top: 3px solid var(--primary);">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🎶</div>
+                        <div style="font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 8px;">Sing-Alongs</div>
+                        <p style="font-size: 13px; color: var(--text-medium); line-height: 1.6;">Classic crowd participation. Hand out lyric sheets or put lyrics on screen. Works best with timeless songs everyone knows — Beatles, Abba, classic musicals. Sea-day gold.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMITMENT SECTION -->
+            <div style="background: var(--primary-lighter); padding: 24px; border-radius: 8px; margin-bottom: 24px; border: 1px solid var(--primary-light);">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text-dark);">✅ Your Commitment Before You Apply</h3>
+                <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 20px; line-height: 1.6;">Most musicians apply with just a song list. You're going to show up with interactive sets ready to go. Tick at least one or two below to commit to preparing them before your first contract.</p>
+
+                <div id="interactiveCommitments" style="display: flex; flex-direction: column; gap: 12px;">
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px; background: var(--white); border-radius: 8px; border: 2px solid var(--border); transition: border-color 0.2s;">
+                        <input type="checkbox" id="commit_ntt" onchange="saveCommitments()" style="margin-top: 2px; accent-color: var(--primary); cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: var(--text-dark);">🎵 Name That Tune set</div>
+                            <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;">I'll prepare a list of 30–50 recognisable intros across different decades and genres.</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px; background: var(--white); border-radius: 8px; border: 2px solid var(--border); transition: border-color 0.2s;">
+                        <input type="checkbox" id="commit_bingo" onchange="saveCommitments()" style="margin-top: 2px; accent-color: var(--primary); cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: var(--text-dark);">🎲 Musical Bingo</div>
+                            <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;">I'll create or source bingo cards and prepare a set of songs to play.</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px; background: var(--white); border-radius: 8px; border: 2px solid var(--border); transition: border-color 0.2s;">
+                        <input type="checkbox" id="commit_trivia" onchange="saveCommitments()" style="margin-top: 2px; accent-color: var(--primary); cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: var(--text-dark);">🎤 Trivia / Quiz Set</div>
+                            <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;">I'll put together a themed music quiz I can host live at the piano (e.g. 80s Night, Film Classics, Motown Legends).</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px; background: var(--white); border-radius: 8px; border: 2px solid var(--border); transition: border-color 0.2s;">
+                        <input type="checkbox" id="commit_singalong" onchange="saveCommitments()" style="margin-top: 2px; accent-color: var(--primary); cursor: pointer;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: var(--text-dark);">🎶 Sing-Along Set</div>
+                            <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;">I'll prepare lyric sheets and a full sing-along set built around timeless crowd favourites.</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="commitmentMessage" style="display: none; margin-top: 16px; padding: 14px; background: var(--primary-light); border-radius: 8px; font-size: 14px; color: var(--text-dark); font-weight: 600;">
+                    🌟 You're already ahead of 90% of applicants. This is exactly what Cruise Directors are looking for.
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="downloadSummary()" style="width: 100%; margin-top: 32px;">📥 Download My Summary</button>
+
+            <div class="button-group" style="margin-top: 12px;">
+                <button class="btn btn-secondary" onclick="goToSection(4)">← Back to Checklist</button>
+                <button class="btn btn-primary" onclick="window.location.href='https://payhip.com/dashboard'">↩ Back to Course</button>
+            </div>
+        </div>
+
+    <script>
+        const STORAGE_KEY = 'module2_data';
+        let appData = {
+            selectedSongs: [],
+            songsKnown: 0,
+            timeline: 6,
+            completedSongs: [],
+            interactiveCommitments: [],
+            skillGaps: [],
+            promoFolderChecked: false
+        };
+
+        let currentSection = 0;
+
+        // Upload handlers set up inline above the upload area
+
+        function handleFile(file) {
+            const status = document.getElementById('status');
+            status.textContent = 'Loading...';
+            status.className = 'status';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    appData.selectedSongs = [];
+                    
+                    workbook.SheetNames.forEach(sheetName => {
+                        if (sheetName.toLowerCase().includes('instruction')) return;
+                        
+                        const sheet = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                        
+                        let checkColumn = 3;
+                        if (sheetName.toLowerCase().includes('piano') || sheetName.toLowerCase().includes('guitar')) {
+                            checkColumn = 6;
+                        }
+                        
+                        console.log(`Sheet: ${sheetName}, checking column ${checkColumn}`);
+                        
+                        rows.forEach((row, idx) => {
+                            if (idx === 0 || !row || row.length === 0) return;
+                            
+                            const checkValue = String(row[checkColumn] || '').trim().toUpperCase();
+                            const hasX = checkValue === 'X' || checkValue === 'TRUE';
+                            
+                            if (!hasX) return;
+                            
+                            let songName = '';
+                            let artist = '';
+                            let genre = sheetName;
+                            
+                            if (sheetName.toLowerCase().includes('universal')) {
+                                songName = String(row[0] || '').trim();
+                                artist = String(row[1] || '').trim();
+                            } else {
+                                artist = String(row[1] || '').trim();
+                                songName = String(row[2] || '').trim();
+                            }
+                            
+                            if (songName) {
+                                appData.selectedSongs.push({ name: songName, artist: artist, genre: genre, id: Math.random() });
+                                console.log(`Added: ${songName} by ${artist}`);
+                            }
+                        });
+                    });
+                    
+                    if (appData.selectedSongs.length === 0) {
+                        status.textContent = '❌ No songs found. Make sure they are marked with X in the correct column';
+                        status.className = 'status error';
+                        return;
+                    }
+                    
+                    status.textContent = '✓ File processed!';
+                    status.className = 'status success';
+                    
+                    document.getElementById('totalSongsEdit').value = appData.selectedSongs.length;
+                    document.getElementById('songsKnownEdit').value = appData.songsKnown || 0;
+                    updateSongsToLearn();
+                    document.getElementById('summarySection').style.display = 'block';
+                    
+                    saveData();
+                    
+                } catch (error) {
+                    status.textContent = '❌ Error: ' + error.message;
+                    status.className = 'status error';
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateSongsToLearn() {
+            const total = parseInt(document.getElementById('totalSongsEdit').value) || 0;
+            const known = parseInt(document.getElementById('songsKnownEdit').value) || 0;
+            const toLearn = Math.max(0, total - known);
+            document.getElementById('songsToLearnDisplay').textContent = toLearn;
+            appData.songsKnown = known;
+            saveData();
+            showAutoSave();
+        }
+
+        function recalculatePace() {
+            const months = parseInt(document.getElementById('timelineInput').value) || 6;
+            appData.timeline = months;
+            const weeks = months * 4;
+            const total = parseInt(document.getElementById('totalSongsEdit').value) || appData.selectedSongs.length;
+            const known = parseInt(document.getElementById('songsKnownEdit').value) || appData.songsKnown;
+            const songsToLearn = Math.max(0, total - known);
+            const songsPerWeek = Math.ceil(songsToLearn / weeks);
+            
+            document.getElementById('totalWeeks').textContent = weeks;
+            document.getElementById('songsToLearnInfo').textContent = songsToLearn;
+            document.getElementById('songsPerWeekInfo').textContent = songsPerWeek;
+            
+            saveData();
+            showAutoSave();
+        }
+
+        function commitToTimeline() {
+            recalculatePace();
+            goToSection(4);
+            renderChecklist();
+            generateCalendarTasks();
+        }
+
+        function generateCalendarTasks() {
+            const container = document.getElementById('calendarTasksList');
+            if (!container) return;
+
+            const months = parseInt(document.getElementById('timelineInput').value) || 6;
+            const weeks = months * 4;
+            const total = parseInt(document.getElementById('totalSongsEdit').value) || appData.selectedSongs.length;
+            const known = parseInt(document.getElementById('songsKnownEdit').value) || appData.songsKnown;
+            const songsToLearn = Math.max(0, total - known);
+            const songsPerWeek = Math.ceil(songsToLearn / weeks);
+
+            let html = `
+                <div style="padding: 12px 16px; background: var(--primary-lighter); border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                    📌 <strong>Weekly recurring:</strong> Learn ${songsPerWeek} new song${songsPerWeek !== 1 ? 's' : ''} — add to your weekly schedule for ${weeks} weeks
+                </div>
+                <div style="padding: 12px 16px; background: var(--primary-lighter); border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                    📌 <strong>Monthly check-in:</strong> Review progress — are you on track? Adjust pace if needed
+                </div>
+                <div style="padding: 12px 16px; background: var(--primary-lighter); border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                    📌 <strong>One-off:</strong> Before you apply — run through your full setlist start to finish
+                </div>
+                <div style="padding: 12px 16px; background: var(--primary-lighter); border-radius: 6px; margin-bottom: 10px; border-left: 3px solid var(--primary);">
+                    📌 <strong>One-off:</strong> Prepare and rehearse at least one interactive set (name-that-tune, sing-along, bingo, or trivia)
+                </div>
+            `;
+
+            // Week-by-week summary
+            html += `<div style="margin-top: 16px; font-size: 13px; color: var(--text-light);">`;
+            html += `<strong style="color: var(--text-dark);">Week-by-week breakdown:</strong><br>`;
+            let cumulative = 0;
+            for (let w = 1; w <= Math.min(weeks, 12); w++) {
+                cumulative = Math.min(w * songsPerWeek, songsToLearn);
+                html += `Week ${w}: ${cumulative} / ${songsToLearn} songs learned &nbsp;`;
+                if (w % 4 === 0) html += `<span style="color: var(--primary); font-weight: 600;">(Month ${w / 4} checkpoint)</span>`;
+                html += `<br>`;
+            }
+            if (weeks > 12) html += `<em>…and so on through week ${weeks}</em><br>`;
+            html += `</div>`;
+
+            container.innerHTML = html;
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = '';
+            
+            const genres = {};
+            appData.selectedSongs.forEach(song => {
+                if (!genres[song.genre]) genres[song.genre] = [];
+                genres[song.genre].push(song);
+            });
+            
+            Object.keys(genres).sort().forEach(genre => {
+                const genreDiv = document.createElement('div');
+                genreDiv.className = 'genre-section';
+                genreDiv.innerHTML = `<div class="genre-title">${genre}</div>`;
+                
+                genres[genre].forEach(song => {
+                    const isCompleted = appData.completedSongs.includes(song.id);
+                    const songDiv = document.createElement('div');
+                    songDiv.className = 'song-item';
+                    songDiv.innerHTML = `
+                        <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleSong(${song.id}, this.checked)">
+                        <div class="song-info">
+                            <div class="song-name">${song.name}</div>
+                            <div class="song-artist">${song.artist}</div>
+                        </div>
+                    `;
+                    genreDiv.appendChild(songDiv);
+                });
+                
+                container.appendChild(genreDiv);
+            });
+            
+            updateProgress();
+        }
+
+        function toggleSong(songId, checked) {
+            if (checked) {
+                if (!appData.completedSongs.includes(songId)) {
+                    appData.completedSongs.push(songId);
+                }
+            } else {
+                appData.completedSongs = appData.completedSongs.filter(id => id !== songId);
+            }
+            updateProgress();
+            saveData();
+            showAutoSave();
+        }
+
+        function updateProgress() {
+            const total = appData.selectedSongs.length;
+            const completed = appData.completedSongs.length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${completed}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${total - completed}</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${Math.round(percentage)}%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            `;
+            document.getElementById('statsContainer').innerHTML = statsHTML;
+        }
+
+        function filterSongs() {
+            const query = document.getElementById('searchSongs').value.toLowerCase();
+            document.querySelectorAll('.song-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function downloadSongListPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            let yPos = 0;
+
+            function drawHeader() {
+                // Clean white header
+                doc.setFillColor(255, 255, 255);
+                // Top accent bar — thin, elegant
+                doc.setFillColor(122, 184, 217);
+                doc.rect(0, 0, pageWidth, 4, 'F');
+
+                yPos = 20;
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(24);
+                doc.setTextColor(30, 30, 30);
+                doc.text('Solo Musician — Song Repertoire', margin, yPos);
+
+                yPos += 8;
+                doc.setFont('Helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(120, 120, 120);
+                doc.text(`${appData.selectedSongs.length} songs across ${Object.keys(groups).length} categories`, margin, yPos);
+
+                // Bottom divider
+                yPos += 6;
+                doc.setDrawColor(220, 220, 220);
+                doc.setLineWidth(0.3);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 10;
+            }
+
+            function drawContinuedHeader() {
+                doc.setFillColor(122, 184, 217);
+                doc.rect(0, 0, pageWidth, 4, 'F');
+                yPos = 16;
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.setTextColor(30, 30, 30);
+                doc.text('Solo Musician — Song Repertoire (continued)', margin, yPos);
+                yPos += 4;
+                doc.setDrawColor(220, 220, 220);
+                doc.setLineWidth(0.3);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 10;
+            }
+
+            // Group songs
+            const groups = {};
+            appData.selectedSongs.forEach(song => {
+                const key = song.genre || 'Other';
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(song);
+            });
+
+            drawHeader();
+
+            // Two-column layout
+            const colWidth = (pageWidth - margin * 2 - 10) / 2;
+            const col1X = margin;
+            const col2X = margin + colWidth + 10;
+            let col1Y = yPos;
+            let col2Y = yPos;
+            let useCol2 = false;
+            const groupKeys = Object.keys(groups).sort();
+
+            groupKeys.forEach(group => {
+                const songs = groups[group];
+                // Estimate block height: header(10) + songs(each ~9px)
+                const blockHeight = 12 + songs.length * 9;
+                let x = useCol2 ? col2X : col1X;
+                let y = useCol2 ? col2Y : col1Y;
+
+                // Need new column or page?
+                if (y + blockHeight > pageHeight - 20) {
+                    if (!useCol2 && col2Y <= col1Y) {
+                        useCol2 = true;
+                        x = col2X;
+                        y = col2Y;
+                    }
+                    if (y + blockHeight > pageHeight - 20) {
+                        doc.addPage();
+                        drawContinuedHeader();
+                        col1Y = yPos;
+                        col2Y = yPos;
+                        useCol2 = false;
+                        x = col1X;
+                        y = col1Y;
+                    }
+                }
+
+                // Genre heading
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(122, 184, 217);
+                doc.text(group.toUpperCase(), x, y);
+                y += 2;
+
+                // Thin line under genre
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.2);
+                doc.line(x, y, x + colWidth, y);
+                y += 5;
+
+                // Songs — title + artist in a clean table feel
+                songs.forEach(song => {
+                    if (y + 9 > pageHeight - 20) {
+                        doc.addPage();
+                        drawContinuedHeader();
+                        col1Y = yPos;
+                        col2Y = yPos;
+                        useCol2 = false;
+                        x = col1X;
+                        y = col1Y;
+                    }
+
+                    // Song name
+                    doc.setFont('Helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(30, 30, 30);
+                    const nameText = doc.splitTextToSize(song.name, colWidth - 5)[0];
+                    doc.text(nameText, x + 2, y);
+
+                    // Artist — right-aligned in same row, grey
+                    if (song.artist && song.artist.trim()) {
+                        doc.setFontSize(8);
+                        doc.setTextColor(150, 150, 150);
+                        const artistText = doc.splitTextToSize(song.artist, colWidth - 5)[0];
+                        doc.text(artistText, x + colWidth - 2, y, { align: 'right' });
+                    }
+
+                    // Light row separator
+                    doc.setDrawColor(240, 240, 240);
+                    doc.setLineWidth(0.1);
+                    doc.line(x, y + 2, x + colWidth, y + 2);
+
+                    y += 8;
+                });
+
+                y += 5;
+
+                if (useCol2) {
+                    col2Y = y;
+                } else {
+                    col1Y = y;
+                    if (col1Y > pageHeight * 0.55 && col2Y <= yPos + 5) {
+                        useCol2 = true;
+                    }
+                }
+            });
+
+            // Footer on each page
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFillColor(122, 184, 217);
+                doc.rect(0, pageHeight - 8, pageWidth, 8, 'F');
+                doc.setFont('Helvetica', 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(255, 255, 255);
+                doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, pageHeight - 3, { align: 'right' });
+            }
+
+            doc.save('song-repertoire.pdf');
+        }
+
+
+        function downloadSummary() {
+            const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            // Collect data
+            const total = appData.selectedSongs.length;
+            const completed = appData.completedSongs.length;
+            const remaining = total - completed;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const months = parseInt(document.getElementById('timelineInput').value) || 6;
+            const weeks = months * 4;
+            const toLearn = Math.max(0, parseInt(document.getElementById('totalSongsEdit').value) - parseInt(document.getElementById('songsKnownEdit').value));
+            const perWeek = Math.ceil(toLearn / weeks);
+
+            const commitLabels = {
+                'commit_ntt': 'Name That Tune set',
+                'commit_bingo': 'Musical Bingo',
+                'commit_trivia': 'Trivia / Quiz Set',
+                'commit_singalong': 'Sing-Along Set'
+            };
+
+            function checkRow(checked, text) {
+                return `<div class="check-row ${checked ? 'checked' : ''}">
+                    <div class="check-box">${checked ? '✓' : ''}</div>
+                    <span>${text}</span>
+                </div>`;
+            }
+
+            // Build song rows by genre
+            const genres = {};
+            appData.selectedSongs.forEach(s => {
+                if (!genres[s.genre]) genres[s.genre] = [];
+                genres[s.genre].push(s);
+            });
+            let songRows = '';
+            Object.keys(genres).sort().forEach(genre => {
+                songRows += `<div style="font-size:11px;font-weight:700;color:#7ab8d9;text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 6px;padding-left:4px;">${genre}</div>`;
+                genres[genre].forEach(song => {
+                    const done = appData.completedSongs.includes(song.id);
+                    songRows += checkRow(done, `${song.name}${song.artist ? ' — ' + song.artist : ''}`);
+                });
+            });
+
+            // Commitment rows
+            const allCommits = ['commit_ntt','commit_bingo','commit_trivia','commit_singalong'];
+            const commitRows = allCommits.map(id =>
+                checkRow(appData.interactiveCommitments.includes(id), commitLabels[id])
+            ).join('');
+
+            // Skill gap rows
+            const gapLabels = {
+                'gap_range': 'Vocal range is limited',
+                'gap_genre': 'Weak in a required genre',
+                'gap_repertoire': 'Total repertoire is small (under 40 songs)',
+                'gap_classical': 'Classical background — developing popular material',
+                'gap_banter': 'Banter and crowd interaction needs work'
+            };
+            const gapRows = Object.keys(gapLabels).map(id =>
+                checkRow(appData.skillGaps && appData.skillGaps.includes(id), gapLabels[id])
+            ).join('');
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Module 2 Summary — The International Musician</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8f9fa; color: #2c3e50; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { max-width: 750px; margin: 0 auto; padding: 0 0 60px; }
+    .header { background: #7ab8d9; color: white; padding: 36px 40px 28px; text-align: center; }
+    .module-label { font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; margin-bottom: 8px; }
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 6px; }
+    .header .subtitle { font-size: 14px; opacity: 0.9; font-weight: 300; }
+    .header .date { font-size: 12px; opacity: 0.75; margin-top: 10px; }
+    .section { background: white; margin: 16px 40px 0; border-radius: 10px; padding: 24px; border: 1px solid #e5e7eb; }
+    .section-heading { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #d4e8f0; display: flex; align-items: center; gap: 8px; }
+    .section-heading .dot { width: 8px; height: 8px; border-radius: 50%; background: #7ab8d9; flex-shrink: 0; }
+    .check-row { display: flex; align-items: flex-start; gap: 12px; padding: 9px 12px; border-radius: 6px; margin-bottom: 6px; background: #f8f9fa; border: 1px solid #e5e7eb; font-size: 13px; color: #4b5563; line-height: 1.5; }
+    .check-row.checked { background: #f0f7fa; border-color: #d4e8f0; color: #2c3e50; }
+    .check-box { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; border: 2px solid #d4e8f0; background: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-top: 1px; }
+    .check-row.checked .check-box { background: #7ab8d9; border-color: #7ab8d9; }
+    .highlight-box { background: #f0f7fa; border: 2px solid #d4e8f0; border-radius: 8px; padding: 16px 20px; margin: 16px 40px 0; display: flex; align-items: center; gap: 20px; }
+    .highlight-label { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+    .highlight-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #7ab8d9; }
+    .highlight-desc { font-size: 13px; color: #4b5563; line-height: 1.5; }
+    .stats-row { display: flex; gap: 12px; margin-bottom: 4px; }
+    .stat-pill { flex: 1; text-align: center; padding: 12px 8px; background: #f0f7fa; border-radius: 8px; border: 1px solid #d4e8f0; }
+    .stat-pill .num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #7ab8d9; }
+    .stat-pill .lbl { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    .next-steps-header { background: #7ab8d9; color: white; padding: 14px 24px; margin: 16px 40px 0; border-radius: 10px 10px 0 0; }
+    .next-steps-header h2 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; }
+    .next-steps-body { background: white; margin: 0 40px; border-radius: 0 0 10px 10px; padding: 20px 24px; border: 1px solid #d4e8f0; border-top: none; }
+    .footer { background: #7ab8d9; color: white; padding: 14px 40px; margin-top: 28px; display: flex; justify-content: space-between; align-items: center; }
+    .footer span { font-size: 12px; opacity: 0.9; }
+    @media print { body { background: white; } .page { max-width: 100%; } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="module-label">The International Musician</div>
+    <h1>Module 2: Song Learning Manager</h1>
+    <div class="subtitle">How to Become a Cruise Ship Musician — Lara Bruyelles</div>
+    <div class="date">Generated ${dateStr}</div>
+  </div>
+
+  <div class="highlight-box">
+    <div>
+      <div class="highlight-label">My Timeline</div>
+      <div class="highlight-value">${months} months</div>
+    </div>
+    <div class="highlight-desc">
+      ${weeks} weeks &nbsp;·&nbsp; ${perWeek} songs/week &nbsp;·&nbsp; ${toLearn} songs to learn
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>My Progress</div>
+    <div class="stats-row">
+      <div class="stat-pill"><div class="num">${total}</div><div class="lbl">Total Songs</div></div>
+      <div class="stat-pill"><div class="num">${completed}</div><div class="lbl">Learned</div></div>
+      <div class="stat-pill"><div class="num">${remaining}</div><div class="lbl">Remaining</div></div>
+      <div class="stat-pill"><div class="num">${pct}%</div><div class="lbl">Complete</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>My Song List</div>
+    ${songRows}
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Interactive Sets — My Commitments</div>
+    ${commitRows}
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Skill Gaps I'm Working On</div>
+    ${gapRows}
+  </div>
+
+  <div class="next-steps-header"><h2>✓ Next Steps</h2></div>
+  <div class="next-steps-body">
+    ${checkRow(false, 'Film my promo showreel in a live setting (Module 3)')}
+    ${checkRow(false, 'Save my song list PDF to my "Promo Materials — Ready to Send" folder')}
+    ${checkRow(false, 'Prepare at least one interactive sea day activity before my first contract')}
+    ${checkRow(false, 'Keep learning — tick off songs as I go')}
+  </div>
+
+  <div class="footer">
+    <span>The International Musician · How to Become a Cruise Ship Musician · Lara Bruyelles</span>
+    <span>Module 2: Song Learning Manager</span>
+  </div>
+</div>
+<script>
+  window.addEventListener('load', function() {
+    setTimeout(function() { window.print(); }, 600);
+  });
+<\/script>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+        }
+
+
+        function toggleContinueBtn() {
+            const checked = document.getElementById('promoFolderCheck').checked;
+            const box = document.getElementById('promoFolderBox');
+            const warning = document.getElementById('promoFolderWarning');
+            box.style.borderColor = checked ? 'var(--primary)' : 'var(--border)';
+            if (checked) warning.style.display = 'none';
+            appData.promoFolderChecked = checked;
+            saveData();
+        }
+
+        function checkPromoFolder() {
+            const checked = document.getElementById('promoFolderCheck').checked;
+            if (!checked) {
+                document.getElementById('promoFolderWarning').style.display = 'block';
+                document.getElementById('promoFolderBox').style.borderColor = '#e57373';
+                document.getElementById('promoFolderBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            goToSection(5);
+        }
+
+        function saveSkillGaps() {
+            const ids = ['gap_range', 'gap_genre', 'gap_repertoire', 'gap_classical', 'gap_banter'];
+            appData.skillGaps = ids.filter(id => {
+                const el = document.getElementById(id);
+                return el && el.checked;
+            });
+            const note = document.getElementById('skillGapNote');
+            if (note) note.style.display = appData.skillGaps.length > 0 ? 'block' : 'none';
+            saveData();
+            showAutoSave();
+        }
+
+        function goToSection(num) {
+            if (num <= 1 || appData.selectedSongs.length > 0) {
+                currentSection = num;
+                document.querySelectorAll('.section-card').forEach(card => card.classList.remove('active'));
+                document.getElementById(`section${num}`).classList.add('active');
+                updateProgressUI();
+                
+                // Show edit timeline button on sections 2 and 3
+                const editBtn = document.getElementById('editTimelineBtn');
+                if (num >= 2) {
+                    editBtn.classList.add('show');
+                } else {
+                    editBtn.classList.remove('show');
+                }
+            }
+        }
+
+        function updateProgressUI() {
+            const totalSteps = 6;
+            const progressLine = document.getElementById('progressLineActive');
+            const lineWidth = ((currentSection + 1) / totalSteps) * 100;
+            progressLine.style.width = lineWidth + '%';
+
+            document.querySelectorAll('.progress-step').forEach((step, idx) => {
+                step.classList.remove('active', 'completed', 'locked');
+                if (idx < currentSection) {
+                    step.classList.add('completed');
+                } else if (idx === currentSection) {
+                    step.classList.add('active');
+                } else {
+                    if (appData.selectedSongs.length === 0) {
+                        step.classList.add('locked');
+                    }
+                }
+            });
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                appData = JSON.parse(saved);
+                return appData;
+            }
+            return null;
+        }
+
+        function showAutoSave() {
+            const indicator = document.getElementById('autoSave');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+
+        function saveCommitments() {
+            const ids = ['commit_ntt', 'commit_bingo', 'commit_trivia', 'commit_singalong'];
+            appData.interactiveCommitments = ids.filter(id => document.getElementById(id).checked);
+            saveData();
+            showAutoSave();
+
+            // Show encouragement message if at least one is checked
+            const msg = document.getElementById('commitmentMessage');
+            if (appData.interactiveCommitments.length > 0) {
+                msg.style.display = 'block';
+            } else {
+                msg.style.display = 'none';
+            }
+        }
+
+        function restoreCommitments() {
+            const ids = ['commit_ntt', 'commit_bingo', 'commit_trivia', 'commit_singalong'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = appData.interactiveCommitments.includes(id);
+            });
+            const msg = document.getElementById('commitmentMessage');
+            if (appData.interactiveCommitments.length > 0) {
+                msg.style.display = 'block';
+            }
+        }
+
+        function resetAll() {
+            if (confirm('Are you sure? This will delete all your saved progress and start over.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        function finishModule() {
+            // Redirect to PayHip course completion
+            window.location.href = 'PAYHIP_URL_HERE';
+            // Fallback if URL not set:
+            // alert('🎉 Great job! You\'ve completed Module 2.');
+        }
+
+        // Load saved data on page load
+        window.addEventListener('load', function() {
+            const saved = loadData();
+            if (saved && saved.selectedSongs && saved.selectedSongs.length > 0) {
+                document.getElementById('totalSongsEdit').value = saved.selectedSongs.length;
+                document.getElementById('songsKnownEdit').value = saved.songsKnown;
+                updateSongsToLearn();
+                document.getElementById('summarySection').style.display = 'block';
+                goToSection(4);
+                renderChecklist();
+                generateCalendarTasks();
+                restoreCommitments();
+                // Restore promo folder checkbox
+                if (saved.promoFolderChecked) {
+                    const el = document.getElementById('promoFolderCheck');
+                    if (el) { el.checked = true; toggleContinueBtn(); }
+                }
+                // Restore skill gaps
+                if (saved.skillGaps) {
+                    saved.skillGaps.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.checked = true;
+                    });
+                    const note = document.getElementById('skillGapNote');
+                    if (note && saved.skillGaps.length > 0) note.style.display = 'block';
+                }
+            } else {
+                goToSection(0);
+            }
+            updateProgressUI();
+        });
+
+        // Save on input changes
+        document.addEventListener('input', () => {
+            if (document.activeElement.id === 'totalSongsEdit' || document.activeElement.id === 'songsKnownEdit' || document.activeElement.id === 'timelineInput') {
+                saveData();
+            }
+        });
+    </script>
+</body>
+</html>
