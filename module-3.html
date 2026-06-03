@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 3: Showreel Production</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #7ab8d9;
+      --primary-light: #d4e8f0;
+      --primary-lighter: #f0f7fa;
+      --text-dark: #2c3e50;
+      --text-medium: #4b5563;
+      --text-light: #6b7280;
+      --background: #f8f9fa;
+      --white: #ffffff;
+      --border: #e5e7eb;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: var(--text-light);
+      font-weight: 300;
+    }
+
+    /* PROGRESS STEPS */
+    .progress-container {
+      background: var(--white);
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .progress-line {
+      position: absolute; top: 16px; left: 0; right: 0;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .progress-line-active {
+      position: absolute; top: 16px; left: 0;
+      height: 2px; background: var(--primary); z-index: 1;
+      transition: width 0.3s ease;
+    }
+    .progress-step { text-align: center; flex: 1; position: relative; z-index: 2; cursor: pointer; }
+    .progress-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--white); border: 2px solid var(--border);
+      margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+    .progress-step:hover .progress-circle { border-color: var(--primary); transform: scale(1.1); }
+    .progress-step.active .progress-circle,
+    .progress-step.completed .progress-circle {
+      background: var(--primary); border-color: var(--primary); color: var(--white);
+    }
+    .progress-label { font-size: 12px; color: var(--text-light); font-weight: 500; }
+    .progress-step.active .progress-label { color: var(--primary); font-weight: 600; }
+
+    /* SECTION CARDS */
+    .section-card {
+      background: var(--white);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: none;
+    }
+    .section-card.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px; font-weight: 600;
+      color: var(--text-dark); margin-bottom: 12px;
+    }
+    .section-subtitle {
+      font-size: 16px; color: var(--text-medium);
+      margin-bottom: 32px; line-height: 1.6;
+    }
+
+    /* BUTTONS */
+    .btn {
+      flex: 1; padding: 14px 24px; border: none; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: var(--primary); color: var(--white);
+      box-shadow: 0 4px 12px rgba(122,184,217,0.3);
+    }
+    .btn-primary:hover {
+      background: #6aa7c8; transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(122,184,217,0.4);
+    }
+    .btn-secondary {
+      background: var(--white); color: var(--text-dark);
+      border: 2px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+    .button-group { display: flex; gap: 16px; margin-top: 32px; }
+
+    /* FORMS */
+    select, textarea, input[type="text"], input[type="date"] {
+      width: 100%; padding: 12px;
+      border: 2px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      color: var(--text-dark); margin-top: 8px;
+      transition: border-color 0.3s ease;
+      background: var(--white);
+    }
+    select:focus, textarea:focus, input[type="text"]:focus, input[type="date"]:focus {
+      outline: none; border-color: var(--primary);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    .form-label {
+      font-weight: 600; font-size: 14px; color: var(--text-dark);
+      margin-bottom: 8px; display: block;
+    }
+
+    /* CHECKLIST */
+    .checklist { display: grid; gap: 10px; margin-top: 16px; }
+    .checklist-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px;
+      background: var(--background);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .checklist-item:hover { border-color: var(--primary-light); background: var(--primary-lighter); }
+    .checklist-item.checked { border-color: var(--primary); background: var(--primary-lighter); }
+    .checklist-item input[type="checkbox"] {
+      width: 18px; height: 18px; margin: 0; flex-shrink: 0;
+      margin-top: 2px; cursor: pointer; accent-color: var(--primary);
+    }
+    .checklist-item label {
+      font-size: 14px; color: var(--text-dark); cursor: pointer; line-height: 1.5;
+      flex: 1; margin: 0; padding: 0; border: none; background: none;
+      width: auto;
+    }
+
+    /* STYLE CARDS GRID */
+    .style-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .style-card {
+      padding: 16px;
+      background: var(--background);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .style-card:hover { border-color: var(--primary-light); }
+    .style-card.captured { border-color: var(--primary); background: var(--primary-lighter); }
+    .style-card-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+    }
+    .style-card input[type="checkbox"] {
+      width: 18px; height: 18px; margin: 0; flex-shrink: 0;
+      cursor: pointer; accent-color: var(--primary);
+    }
+    .style-card-title {
+      font-weight: 600; font-size: 14px; color: var(--text-dark);
+    }
+    .style-card p {
+      font-size: 13px; color: var(--text-light);
+      margin: 0; line-height: 1.5; padding-left: 28px;
+    }
+
+    /* GIG LIST */
+    .gig-list { display: grid; gap: 10px; margin-top: 16px; }
+    .gig-row {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .gig-row input { margin-top: 0; }
+    .btn-remove {
+      background: var(--white);
+      border: 2px solid var(--border);
+      color: var(--text-light);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-remove:hover { border-color: #f87171; color: #ef4444; background: #fef2f2; }
+
+    /* INFO BOXES */
+    .info-box-blue {
+      background: var(--primary-light);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--primary);
+    }
+    .info-box-blue h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; margin-bottom: 8px; color: var(--text-dark);
+    }
+    .info-box-light {
+      background: var(--primary-lighter);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .info-box-light h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; margin-bottom: 12px; color: var(--text-dark);
+    }
+    .info-box-light p, .info-box-light li {
+      font-size: 14px; color: var(--text-dark); line-height: 1.8;
+    }
+    .info-box-light ul { padding-left: 0; list-style: none; }
+    .info-box-light li::before { content: '→ '; color: var(--primary); font-weight: 600; }
+
+    /* JOURNEY FLOW */
+    .journey-flow { display: grid; gap: 0; margin: 24px 0; }
+    .journey-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .journey-item:last-child { border-bottom: none; }
+    .journey-number {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(122,184,217,0.4);
+    }
+    .journey-content h4 {
+      font-weight: 600; font-size: 15px; color: var(--text-dark); margin-bottom: 4px;
+    }
+    .journey-content p {
+      font-size: 13px; color: var(--text-light); line-height: 1.5;
+    }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* TIMELINE SELECTOR */
+    .timeline-box {
+      background: var(--primary-lighter);
+      border: 2px solid var(--primary-light);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .timeline-desc {
+      font-size: 13px; color: var(--text-medium);
+      margin-top: 10px; line-height: 1.6;
+    }
+
+    /* CALENDAR TASKS BOX */
+    .tasks-box {
+      background: var(--white);
+      border: 2px solid var(--primary-light);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .tasks-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; margin-bottom: 16px; color: var(--text-dark);
+    }
+    .task-line {
+      font-size: 14px; color: var(--text-dark); line-height: 2.2;
+    }
+
+    /* AUTO-SAVE */
+    .auto-save {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--primary); color: var(--white);
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      opacity: 0; transform: translateY(20px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(122,184,217,0.3);
+      font-family: 'Inter', sans-serif;
+    }
+    .auto-save.show { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px; }
+      .header h1 { font-size: 28px; }
+      .section-card { padding: 24px; }
+      .section-title { font-size: 24px; }
+      .button-group { flex-direction: column; }
+      .gig-row { grid-template-columns: 1fr; }
+      .style-grid { grid-template-columns: 1fr; }
+    }
+
+    /* FATAL MISTAKES WARNING BOX */
+    .info-box-warning {
+      background: #fff5f5;
+      padding: 20px 24px;
+      border-radius: 8px;
+      border-left: 4px solid #ef4444;
+      margin-bottom: 0;
+    }
+    .info-box-warning h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; margin-bottom: 14px; color: #b91c1c;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .fatal-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px 12px; border-radius: 6px; margin-bottom: 6px;
+      background: white; border: 1px solid #fecaca;
+      font-size: 14px; color: #374151; line-height: 1.5;
+    }
+    .fatal-item:last-child { margin-bottom: 0; }
+    .fatal-x {
+      width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+      background: #ef4444; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; margin-top: 1px;
+    }
+
+    /* FOOTAGE LADDER */
+    .ladder { display: grid; gap: 10px; margin-top: 16px; }
+    .ladder-item {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 14px; align-items: start;
+      padding: 16px;
+      background: var(--background);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.2s ease;
+    }
+    .ladder-item.done { border-color: var(--primary); background: var(--primary-lighter); }
+    .ladder-rank {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary-light); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .ladder-item.done .ladder-rank { background: var(--primary); color: white; }
+    .ladder-body h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; }
+    .ladder-body p { font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0; }
+    .ladder-cal {
+      background: white; border: 1.5px solid var(--border);
+      border-radius: 6px; padding: 6px 10px;
+      font-size: 12px; font-weight: 600; color: var(--primary);
+      cursor: pointer; white-space: nowrap; margin-top: 2px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .ladder-cal:hover { border-color: var(--primary); background: var(--primary-lighter); }
+    .ladder-cb { width: 18px; height: 18px; margin: 0; flex-shrink: 0; accent-color: var(--primary); margin-top: 2px; }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Module 3: Showreel Production</h1>
+    <p>Get live audience footage → know exactly what agencies need → submit a reel that gets you hired</p>
+  </div>
+
+  <!-- PROGRESS STEPS -->
+  <div class="progress-container">
+    <div class="progress-steps">
+      <div class="progress-line"></div>
+      <div class="progress-line-active" id="progressLineActive"></div>
+
+      <div class="progress-step active" data-section="1" onclick="goToSection(1)">
+        <div class="progress-circle">1</div>
+        <div class="progress-label">Standards</div>
+      </div>
+      <div class="progress-step" data-section="2" onclick="goToSection(2)">
+        <div class="progress-circle">2</div>
+        <div class="progress-label">Film</div>
+      </div>
+      <div class="progress-step" data-section="3" onclick="goToSection(3)">
+        <div class="progress-circle">3</div>
+        <div class="progress-label">Timeline</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="section1" class="section-card active">
+    <h2 class="section-title">Agency Non-Negotiables</h2>
+    <p class="section-subtitle">These come straight from top cruise agencies. Every item below is a reason a reel gets rejected — or hired.</p>
+
+    <label class="form-label">✅ Agency non-negotiables — use this as your guide while building the reel, and your final check before you submit:</label>
+    <div class="checklist" id="requirements-checklist">
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-1')">
+        <input type="checkbox" id="req-1">
+        <label><strong>Open with music, not an intro.</strong> Your reel must start with you already playing — no "welcome to the stage", no MC moment, no dead air.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-2')">
+        <input type="checkbox" id="req-2">
+        <label><strong>Keep clips moving.</strong> Long enough to feel each style, but not 30–60 seconds per song. Aim for 15–30 seconds per clip — varied, punchy, never boring.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-3')">
+        <input type="checkbox" id="req-3">
+        <label><strong>Show banter and audience interaction.</strong> Lines need to see you can work the room — not just play. A moment of crowd engagement is worth more than a perfect vocal run.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-4')">
+        <input type="checkbox" id="req-4">
+        <label><strong>Show at least 4 different genres.</strong> Pop, rock, older classics, jazz — variety over virtuosity in one style. Agencies need to know you can entertain a mixed crowd all evening.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-5')">
+        <input type="checkbox" id="req-5">
+        <label><strong>Film in front of a LIVE AUDIENCE.</strong> Not a studio. Not your living room. Real people, real atmosphere. This is non-negotiable — production value is not the point, audience energy is.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-6')">
+        <input type="checkbox" id="req-6">
+        <label><strong>Dress appropriately.</strong> Not a suit or ballgown — but not ripped jeans or a hat backwards either. Smart-casual, presentable, professional enough for a cruise ship stage.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-7')">
+        <input type="checkbox" id="req-7">
+        <label><strong>Total length: 3–5 minutes.</strong> Not longer. Agents watch hundreds of reels — a tight 4-minute reel wins over an 8-minute one every time.</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'req-8')">
+        <input type="checkbox" id="req-8">
+        <label><strong>Share as a PUBLIC streaming link — and test it.</strong> YouTube (public or unlisted is fine). Never a downloadable file. Never password-protected. Open the link in an incognito window before submitting. Agents won't chase a link that doesn't work.</label>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="info-box-warning">
+      <h3>🚫 Fatal Mistakes — any one of these will get your reel rejected</h3>
+      <div class="fatal-item">
+        <div class="fatal-x">✕</div>
+        <span><strong>Private, password-protected, or broken link.</strong> If an agent can't open it in 10 seconds, it goes in the bin.</span>
+      </div>
+      <div class="fatal-item">
+        <div class="fatal-x">✕</div>
+        <span><strong>Same genre / same energy for every clip.</strong> Even if you play it brilliantly — 10 ballads in a row says "I can only do one thing".</span>
+      </div>
+      <div class="fatal-item">
+        <div class="fatal-x">✕</div>
+        <span><strong>Studio-only footage with no audience.</strong> A technically perfect recording in an empty room does not prove you can hold a crowd on a ship for 4 hours.</span>
+      </div>
+      <div class="fatal-item">
+        <div class="fatal-x">✕</div>
+        <span><strong>Long MC intros or dead time at the start.</strong> If the music doesn't start in the first 5 seconds, most agents will move on.</span>
+      </div>
+      <div class="fatal-item">
+        <div class="fatal-x">✕</div>
+        <span><strong>Prioritising production quality over live energy.</strong> A shaky phone video of you genuinely connecting with an audience will always beat a studio-shot reel with no crowd.</span>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <label class="form-label" style="margin-top: 8px;">Song Style Coverage — check off each style as you capture usable footage:</label>
+    <div class="style-grid">
+      <div class="style-card" onclick="toggleStyle(this, 'style-1')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-1">
+          <span class="style-card-title">Uptempo / energetic</span>
+        </div>
+        <p>START your reel here — shows energy and skill immediately</p>
+      </div>
+      <div class="style-card" onclick="toggleStyle(this, 'style-2')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-2">
+          <span class="style-card-title">Ballad / emotional</span>
+        </div>
+        <p>Place toward the END — shows vocal range and depth</p>
+      </div>
+      <div class="style-card" onclick="toggleStyle(this, 'style-3')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-3">
+          <span class="style-card-title">Classic rock / pop</span>
+        </div>
+        <p>Crowd favorites — sing-alongs, high engagement</p>
+      </div>
+      <div class="style-card" onclick="toggleStyle(this, 'style-4')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-4">
+          <span class="style-card-title">Jazz / standards / older songs</span>
+        </div>
+        <p>Shows sophistication and versatility across decades</p>
+      </div>
+      <div class="style-card" onclick="toggleStyle(this, 'style-5')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-5">
+          <span class="style-card-title">Rock & roll / boogie / bluesy</span>
+        </div>
+        <p>High energy — audience gets involved fast</p>
+      </div>
+      <div class="style-card" onclick="toggleStyle(this, 'style-6')">
+        <div class="style-card-header">
+          <input type="checkbox" id="style-6">
+          <span class="style-card-title">Audience interaction / banter</span>
+        </div>
+        <p>ESSENTIAL — show you can host the room, not just play in it</p>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="info-box-blue" style="margin-top: 24px;">
+      <h3>💬 Straight from the agents</h3>
+      <p style="font-size: 14px; color: var(--text-medium); line-height: 1.7;">"The best reels are not filmed in a studio. We want to see someone who can hold a room — energy, banter, range. A phone video in a pub with a real crowd will always beat a polished studio recording. Start with your strongest, most energetic clip. Show us different styles. And for the love of god, make the link public."</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <label class="form-label">How will you show diversity across genres in your reel? (optional — your notes)</label>
+    <textarea id="diversity-notes" placeholder="Example: I'll open with an uptempo Shania Twain, then move through a bit of jazz, old-school rock, and close with a ballad. I'll make sure at least one clip shows me bantering with the crowd..."></textarea>
+
+    <div class="button-group">
+      <button class="btn btn-primary" onclick="goToSection(2)">Continue → Film →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2: FILM -->
+  <div id="section2" class="section-card">
+    <h2 class="section-title">Filming Your Performances</h2>
+    <p class="section-subtitle">Audience footage is the single most important raw material for your reel. Everything else — editing, audio quality, production — comes second. Get in front of people and film.</p>
+
+    <div style="margin-bottom: 28px;">
+      <p class="form-label" style="margin-bottom: 12px;">🎬 Watch this first — I walk you through how to film footage for your showreel:</p>
+      <div style="position: relative; padding-bottom: 62.5%; height: 0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+        <iframe src="https://www.loom.com/embed/2a987240385a467f9116837a1833ebce" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+      </div>
+    </div>
+
+    <div class="info-box-blue" style="margin-bottom: 28px;">
+      <h3>📌 Tied to your Module 1 commitment</h3>
+      <p style="font-size: 14px; color: var(--text-medium); line-height: 1.7;">In Module 1 you committed to booking gigs and open mics. This is where that commitment becomes footage. Every performance you play from now on is a filming opportunity — treat it that way.</p>
+    </div>
+
+    <label class="form-label">No footage yet? Use this ladder — ranked from easiest to hardest to arrange:</label>
+    <div class="ladder">
+
+      <div class="ladder-item" id="ladder-1-wrap">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank">1</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-1" onchange="toggleLadder('ladder-1-wrap','ladder-1'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Open mic nights — go as often as possible</h4>
+          <p>The fastest, cheapest way to get live audience footage. Most cities have multiple open mics per week. You don't need to be booked — just sign up on the night. Film every single one.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Find open mic nights nearby this week')">+ Calendar</button>
+      </div>
+
+      <div class="ladder-item" id="ladder-2-wrap">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank">2</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-2" onchange="toggleLadder('ladder-2-wrap','ladder-2'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Restaurants, bars, cafés, hotel lobbies</h4>
+          <p>Call ahead, ask to play a short set — even for free or reduced rate. Ambient background gigs still count as live audience footage. Hotel lobbies especially love live music.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Contact 5 local venues about background music gigs')">+ Calendar</button>
+      </div>
+
+      <div class="ladder-item" id="ladder-3-wrap">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank">3</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-3" onchange="toggleLadder('ladder-3-wrap','ladder-3'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Retirement homes and care facilities</h4>
+          <p>Consistently receptive, often grateful, and the audience is very real. These bookings are easy to arrange, repeat, and the repertoire overlap with cruise ship is high.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Contact local care homes about live music performance')">+ Calendar</button>
+      </div>
+
+      <div class="ladder-item" id="ladder-4-wrap">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank">4</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-4" onchange="toggleLadder('ladder-4-wrap','ladder-4'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Busking (where legal)</h4>
+          <p>Immediate audience, zero gatekeeping. Check local licensing rules. A phone + tripod on a busy high street generates authentic crowd footage quickly — people stopping to listen is gold.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Check busking permits and schedule busking session')">+ Calendar</button>
+      </div>
+
+      <div class="ladder-item" id="ladder-5-wrap">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank">5</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-5" onchange="toggleLadder('ladder-5-wrap','ladder-5'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Friends', community events, private parties</h4>
+          <p>Birthdays, house parties, community gatherings. Offer to play. These audiences are naturally engaged and easy to film. Don't be precious — any real people in the room counts.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Message friends and family about playing at upcoming events')">+ Calendar</button>
+      </div>
+
+      <div class="ladder-item" id="ladder-6-wrap" style="border-style: dashed; opacity: 0.85;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div class="ladder-rank" style="background: #e5e7eb; color: var(--text-light);">6</div>
+          <input type="checkbox" class="ladder-cb" id="ladder-6" onchange="toggleLadder('ladder-6-wrap','ladder-6'); saveProgress()">
+        </div>
+        <div class="ladder-body">
+          <h4>Last resort: staged "live-feel" session with invited audience</h4>
+          <p>Invite 10–20 friends or fellow musicians to watch you perform. Set up in a venue or large room. It must feel and look like a real performance — not a rehearsal. Only use this if you genuinely cannot access any of the above options.</p>
+        </div>
+        <button class="ladder-cal" onclick="calendarPrompt('Plan live-feel session — invite audience, book venue')">+ Calendar</button>
+      </div>
+
+    </div>
+
+    <hr class="section-divider">
+
+    <label class="form-label">Your Gig Schedule — add performances where you'll film:</label>
+    <div id="gig-list" class="gig-list"></div>
+    <button class="btn btn-secondary" onclick="addGig()" style="margin-top: 12px; flex: none; padding: 10px 20px; font-size: 14px;">+ Add Gig</button>
+
+    <hr class="section-divider">
+
+    <label class="form-label">Pre-Gig Filming Setup — run through this before every performance:</label>
+    <div class="checklist">
+      <div class="checklist-item" onclick="toggleCheck(this, 'film-1')">
+        <input type="checkbox" id="film-1">
+        <label>Phone + tripod ready — arrive 20 minutes early to set up</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'film-2')">
+        <input type="checkbox" id="film-2">
+        <label>Framing: you at the instrument with audience visible in the shot if possible</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'film-3')">
+        <input type="checkbox" id="film-3">
+        <label>Audio test: play a few bars and confirm levels aren't distorting</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'film-4')">
+        <input type="checkbox" id="film-4">
+        <label>Lighting check: your face is clearly visible throughout</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'film-5')">
+        <input type="checkbox" id="film-5">
+        <label>Phone has enough storage for a 2–3 hour recording</label>
+      </div>
+    </div>
+
+    <div class="info-box-light" style="margin-top: 24px;">
+      <h3>💡 Film everything — sort it later</h3>
+      <p>Hit record before you start and don't stop until the set ends. You'll have a 2-hour file — that's fine. Scrub through it afterwards to find the best 15–30 second clips. Natural moments and real reactions are what you're looking for. A phone video of a genuinely engaged crowd beats a studio recording every single time.</p>
+    </div>
+
+    <div class="button-group">
+      <button class="btn btn-secondary" onclick="goToSection(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goToSection(3)">Continue → Timeline →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 3: TIMELINE -->
+  <div id="section3" class="section-card">
+    <h2 class="section-title">Your Timeline & Next Steps</h2>
+    <p class="section-subtitle">Set your production timeline and transfer tasks to your personal calendar.</p>
+
+    <label class="form-label">How much time do you have to complete your showreel?</label>
+    <div class="timeline-box">
+      <select id="timeline-selector" onchange="updateTimeline()">
+        <option value="1">1 month</option>
+        <option value="2">2 months</option>
+        <option value="3">3 months</option>
+        <option value="6" selected>6 months</option>
+        <option value="9">9 months</option>
+        <option value="12">12 months</option>
+      </select>
+      <p class="timeline-desc" id="timeline-desc"></p>
+    </div>
+
+    <div class="info-box-blue">
+      <h3>⏰ Critical reminder</h3>
+      <p style="font-size: 14px; color: var(--text-medium); line-height: 1.7;">Set a recurring Sunday reminder to review your progress. Make sure you have <strong>at least 1 month</strong> before your application deadline with all footage captured, edited, and uploaded. Don't leave this to the last minute.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <label class="form-label">Target Your Applications — not all lines want the same thing</label>
+    <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 16px; line-height: 1.6;">Your reel stays the same. But knowing the personality of each line lets you pitch yourself as the right fit — not just a good musician. Agents like Ash at Blackburn pitch specific performers to specific lines: <em>"I can't wait to show Jeff at Celebrity this person."</em> That's the level of targeting you're aiming for.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+
+      <div style="background: var(--background); border: 2px solid var(--border); border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Ultra-Luxury</div>
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 4px;">Seabourn · Azamara · Regent</div>
+        <p style="font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0;">Jazz, standards, sophisticated contemporary. Smaller ships, intimate lounges, discerning guests. Your reel should lead with elegance and versatility.</p>
+      </div>
+
+      <div style="background: var(--background); border: 2px solid var(--border); border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Premium</div>
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 4px;">Celebrity · Holland America · Princess</div>
+        <p style="font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0;">Broad appeal — pop, rock, standards mix. Evening entertainment focus, mixed age groups. Range and crowd connection matter most.</p>
+      </div>
+
+      <div style="background: var(--background); border: 2px solid var(--border); border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Contemporary / Mass Market</div>
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 4px;">Carnival · Royal Caribbean · Norwegian</div>
+        <p style="font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0;">High energy, contemporary pop, accessible catalog. Younger mixed demographic. Your reel should show energy, uptempo range, and audience interaction.</p>
+      </div>
+
+      <div style="background: var(--background); border: 2px solid var(--border); border-radius: 8px; padding: 16px;">
+        <div style="font-weight: 700; font-size: 13px; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">European / Language Lines</div>
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 4px;">TUI · AIDA · MSC</div>
+        <p style="font-size: 13px; color: var(--text-light); line-height: 1.5; margin: 0;">Language is a filter before your reel is even watched. German lines want German speakers. If you have relevant language skills or European repertoire, lead with it.</p>
+      </div>
+
+    </div>
+
+    <div class="info-box-warning" style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px;">⚠️ The international repertoire test</h3>
+      <p style="font-size: 14px; color: var(--text-medium); line-height: 1.7; margin-top: 4px;">Cruise ships carry guests from dozens of countries. Before putting any song in your reel or set list, ask: <strong>"Would a passenger from Japan, Germany, and the US all potentially recognise this?"</strong> If the answer is no — regional hits, local artists, national-market-only songs — it's a risk unless you're specifically targeting a line that caters to that market.</p>
+    </div>
+
+    <label class="form-label">Your target lines — research and notes</label>
+    <div class="checklist" style="margin-bottom: 16px;">
+      <div class="checklist-item" onclick="toggleCheck(this, 'target-1')">
+        <input type="checkbox" id="target-1">
+        <label>I've identified at least 3 cruise lines that match my style and experience level</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'target-2')">
+        <input type="checkbox" id="target-2">
+        <label>I've looked at their job postings to understand what they specifically ask for</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'target-3')">
+        <input type="checkbox" id="target-3">
+        <label>I've searched YouTube for existing performers on those lines to understand the vibe</label>
+      </div>
+      <div class="checklist-item" onclick="toggleCheck(this, 'target-4')">
+        <input type="checkbox" id="target-4">
+        <label>My reel communicates fit for my target lines — not just talent in general</label>
+      </div>
+    </div>
+
+    <textarea id="target-notes" placeholder="Which lines are you targeting and why? Any language skills or repertoire advantages relevant to specific lines?&#10;&#10;Example: Primarily targeting Celebrity and Holland America — my jazz/standards range fits well. Also interested in Azamara once I have more footage of intimate lounge settings. MSC a possibility if I develop more French-language material..." style="margin-bottom: 0;"></textarea>
+
+    <hr class="section-divider">
+
+    <label class="form-label">Production Notes</label>
+    <textarea id="production-notes" placeholder="Track your progress, ideas, or challenges as you work on your showreel...&#10;&#10;Example: Need to ask venue manager about tripod position... Captured great uptempo song at last gig but audio was low..."></textarea>
+
+    <div class="tasks-box">
+      <h3>📅 Add These to Your Calendar</h3>
+      <div class="task-line">
+        → 🎯 Book 1–2 performance venues per month<br>
+        → 🎥 Film every performance you play (no exceptions)<br>
+        → 📋 Review footage within 48 hours of each gig<br>
+        → ✂️ Start editing once you have 3+ gigs filmed<br>
+        → 📤 Upload to YouTube and test your link<br>
+        → 🔍 Get feedback from 1–2 trusted musicians<br>
+        → 🎬 Make final adjustments before applications
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="downloadSummary()" style="width: 100%; margin-top: 32px;">📥 Download My Summary</button>
+
+    <div class="button-group" style="margin-top: 12px;">
+      <button class="btn btn-secondary" onclick="goToSection(2)">← Back</button>
+      <button class="btn btn-primary" onclick="finishModule()">↩ Back to Course</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="auto-save" id="autoSave">Progress saved ✓</div>
+
+<script>
+  let currentSection = 1;
+  const totalSections = 3;
+  let gigs = [];
+
+  // ── LADDER HELPERS ───────────────────────────────────────
+  function toggleLadder(wrapId, cbId) {
+    const cb = document.getElementById(cbId);
+    const wrap = document.getElementById(wrapId);
+    if (wrap) wrap.classList.toggle('done', cb.checked);
+  }
+
+  function calendarPrompt(task) {
+    alert('Add to your calendar:\n\n"' + task + '"\n\nOpen your calendar app and set a specific date for this — a vague intention is not a plan.');
+  }
+
+  // ── NAVIGATION ──────────────────────────────────────────
+  function goToSection(n) {
+    document.querySelectorAll('.section-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.progress-step').forEach(s => {
+      const num = parseInt(s.dataset.section);
+      s.classList.remove('active', 'completed');
+      if (num === n) s.classList.add('active');
+      else if (num < n) s.classList.add('completed');
+    });
+    document.getElementById('section' + n).classList.add('active');
+    currentSection = n;
+    updateProgressLine(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    saveProgress();
+  }
+
+  function updateProgressLine(n) {
+    const line = document.getElementById('progressLineActive');
+    const pct = ((n - 1) / (totalSections - 1)) * 100;
+    line.style.width = pct + '%';
+  }
+
+  // ── CHECKBOXES ───────────────────────────────────────────
+  function toggleCheck(el, id) {
+    const cb = document.getElementById(id);
+    cb.checked = !cb.checked;
+    el.classList.toggle('checked', cb.checked);
+    saveProgress();
+  }
+
+  function toggleStyle(el, id) {
+    const cb = document.getElementById(id);
+    cb.checked = !cb.checked;
+    el.classList.toggle('captured', cb.checked);
+    saveProgress();
+  }
+
+  // ── GIGS ─────────────────────────────────────────────────
+  function addGig() {
+    gigs.push({ date: '', venue: '' });
+    renderGigs();
+    saveProgress();
+  }
+
+  function removeGig(i) {
+    gigs.splice(i, 1);
+    renderGigs();
+    saveProgress();
+  }
+
+  function renderGigs() {
+    const container = document.getElementById('gig-list');
+    container.innerHTML = gigs.map((g, i) => `
+      <div class="gig-row">
+        <input type="date" value="${g.date}" onchange="gigs[${i}].date=this.value; saveProgress()">
+        <input type="text" value="${g.venue}" placeholder="Venue name" onchange="gigs[${i}].venue=this.value; saveProgress()">
+        <button class="btn-remove" onclick="removeGig(${i})">Remove</button>
+      </div>
+    `).join('');
+  }
+
+  // ── TIMELINE ─────────────────────────────────────────────
+  function updateTimeline() {
+    const val = parseInt(document.getElementById('timeline-selector').value);
+    const desc = document.getElementById('timeline-desc');
+    const messages = {
+      1: 'Aggressive — book venues immediately and film within the first 2 weeks.',
+      2: 'Focused — aim for 2–3 gigs in the first month. Start filming right away.',
+      3: 'Balanced — book 3–4 gigs spread across your timeline. Start in week 1.',
+      6: 'Comfortable — 4–6 performances gives you solid footage variety.',
+      9: 'Plenty of time — aim for 6+ gigs across different venues and audiences.',
+      12: 'Long horizon — use the first 6 months to gather footage, the rest to refine.'
+    };
+    desc.textContent = messages[val] || '';
+    saveProgress();
+  }
+
+  // ── SAVE & LOAD ──────────────────────────────────────────
+  function saveProgress() {
+    const checkboxes = {};
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      checkboxes[cb.id] = cb.checked;
+    });
+    const data = {
+      section: currentSection,
+      gigs,
+      checkboxes,
+      timeline: document.getElementById('timeline-selector')?.value || '6',
+      diversityNotes: document.getElementById('diversity-notes')?.value || '',
+      targetNotes: document.getElementById('target-notes')?.value || '',
+      productionNotes: document.getElementById('production-notes')?.value || ''
+    };
+    localStorage.setItem('module3_progress', JSON.stringify(data));
+    showAutoSave();
+  }
+
+  function loadProgress() {
+    const raw = localStorage.getItem('module3_progress');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+
+    // Gigs
+    if (data.gigs) { gigs = data.gigs; renderGigs(); }
+    else { gigs = [{date:'',venue:''},{date:'',venue:''},{date:'',venue:''}]; renderGigs(); }
+
+    // Checkboxes + ladder items
+    if (data.checkboxes) {
+      Object.entries(data.checkboxes).forEach(([id, val]) => {
+        const cb = document.getElementById(id);
+        if (!cb) return;
+        cb.checked = val;
+        const item = cb.closest('.checklist-item');
+        const card = cb.closest('.style-card');
+        const wrapId = id + '-wrap';
+        const wrap = document.getElementById(wrapId);
+        if (item) item.classList.toggle('checked', val);
+        if (card) card.classList.toggle('captured', val);
+        if (wrap) wrap.classList.toggle('done', val);
+      });
+    }
+
+    // Timeline
+    if (data.timeline) {
+      const sel = document.getElementById('timeline-selector');
+      if (sel) sel.value = data.timeline;
+    }
+
+    // Textareas
+    if (data.diversityNotes) {
+      const el = document.getElementById('diversity-notes');
+      if (el) el.value = data.diversityNotes;
+    }
+    if (data.targetNotes) {
+      const el = document.getElementById('target-notes');
+      if (el) el.value = data.targetNotes;
+    }
+    if (data.productionNotes) {
+      const el = document.getElementById('production-notes');
+      if (el) el.value = data.productionNotes;
+    }
+  }
+
+  function showAutoSave() {
+    const el = document.getElementById('autoSave');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+
+  // ── PDF DOWNLOAD ─────────────────────────────────────────
+  function downloadSummary() {
+    // Collect all data
+    const timeline = document.getElementById('timeline-selector')?.value || '6';
+    const diversityNotes = document.getElementById('diversity-notes')?.value || '';
+    const targetNotes = document.getElementById('target-notes')?.value || '';
+    const productionNotes = document.getElementById('production-notes')?.value || '';
+    const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    const requirements = [];
+    document.querySelectorAll('#requirements-checklist .checklist-item').forEach(item => {
+      const cb = item.querySelector('input[type="checkbox"]');
+      const lbl = item.querySelector('label');
+      if (cb && lbl) requirements.push({ checked: cb.checked, text: lbl.textContent.trim() });
+    });
+
+
+    const fatalMistakes = [
+      'Private, password-protected, or broken link',
+      'Same genre / same energy for every clip',
+      'Studio-only footage with no live audience',
+      'Long MC intros or dead air at the start',
+      'Prioritising production quality over live energy'
+    ];
+
+    const styles = [];
+    document.querySelectorAll('.style-card').forEach(card => {
+      const cb = card.querySelector('input[type="checkbox"]');
+      const title = card.querySelector('.style-card-title');
+      if (cb && title) styles.push({ checked: cb.checked, text: title.textContent.trim() });
+    });
+
+    const scheduledGigs = gigs.filter(g => g.date && g.venue);
+
+    // Build checklist rows HTML
+    function checklistRows(items) {
+      return items.map(item => `
+        <div class="check-row ${item.checked ? 'checked' : ''}">
+          <div class="check-box">${item.checked ? '✓' : ''}</div>
+          <span>${item.text}</span>
+        </div>
+      `).join('');
+    }
+
+    // Build gig rows HTML
+    const gigsHTML = scheduledGigs.length > 0
+      ? scheduledGigs.map(g => {
+          const d = new Date(g.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          return `<div class="gig-row-pdf"><span class="gig-date">${d}</span><span class="gig-venue">${g.venue}</span></div>`;
+        }).join('')
+      : '<p class="empty-note">No gigs scheduled yet</p>';
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Module 3 Summary — The International Musician</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      color: #2c3e50;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .page { max-width: 750px; margin: 0 auto; padding: 0 0 60px 0; }
+
+    /* HEADER */
+    .header {
+      background: #7ab8d9;
+      color: white;
+      padding: 36px 40px 28px;
+      text-align: center;
+    }
+    .header .module-label {
+      font-size: 12px; font-weight: 500; letter-spacing: 2px;
+      text-transform: uppercase; opacity: 0.85; margin-bottom: 8px;
+    }
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; font-weight: 700; margin-bottom: 6px;
+    }
+    .header .subtitle { font-size: 14px; opacity: 0.9; font-weight: 300; }
+    .header .date { font-size: 12px; opacity: 0.75; margin-top: 10px; }
+
+    /* TIMELINE BADGE */
+    .timeline-section {
+      background: white;
+      margin: 28px 40px 0;
+      border-radius: 10px;
+      padding: 20px 24px;
+      border: 2px solid #d4e8f0;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .timeline-label { font-size: 13px; font-weight: 600; color: #6b7280; }
+    .timeline-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-weight: 700; color: #7ab8d9;
+    }
+    .timeline-desc { font-size: 13px; color: #4b5563; line-height: 1.5; }
+
+    /* SECTION */
+    .section {
+      background: white;
+      margin: 16px 40px 0;
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+    }
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 600; color: #2c3e50;
+      margin-bottom: 16px; padding-bottom: 10px;
+      border-bottom: 2px solid #d4e8f0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-heading .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #7ab8d9; flex-shrink: 0;
+    }
+
+    /* CHECKLIST */
+    .check-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 9px 12px; border-radius: 6px; margin-bottom: 6px;
+      background: #f8f9fa; border: 1px solid #e5e7eb;
+      font-size: 13px; color: #4b5563; line-height: 1.5;
+    }
+    .check-row.checked {
+      background: #f0f7fa; border-color: #d4e8f0; color: #2c3e50;
+    }
+    .check-box {
+      width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0;
+      border: 2px solid #d4e8f0; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 700;
+      color: white; background: white; margin-top: 1px;
+    }
+    .check-row.checked .check-box { background: #7ab8d9; border-color: #7ab8d9; }
+
+    /* STYLES GRID */
+    .styles-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+
+    /* GIGS */
+    .gig-row-pdf {
+      display: flex; gap: 16px; align-items: center;
+      padding: 9px 12px; border-radius: 6px; margin-bottom: 6px;
+      background: #f8f9fa; border: 1px solid #e5e7eb;
+    }
+    .gig-date { font-size: 13px; font-weight: 600; color: #7ab8d9; min-width: 110px; }
+    .gig-venue { font-size: 13px; color: #2c3e50; }
+    .empty-note { font-size: 13px; color: #9ca3af; font-style: italic; }
+
+    /* NOTES */
+    .notes-text {
+      font-size: 13px; color: #4b5563; line-height: 1.7;
+      background: #f8f9fa; border: 1px solid #e5e7eb;
+      border-radius: 6px; padding: 14px;
+    }
+
+    /* NEXT STEPS */
+    .next-steps-header {
+      background: #7ab8d9; color: white;
+      padding: 14px 24px; margin: 16px 40px 0;
+      border-radius: 10px 10px 0 0;
+    }
+    .next-steps-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 600;
+    }
+    .next-steps-body {
+      background: white; margin: 0 40px;
+      border-radius: 0 0 10px 10px;
+      padding: 20px 24px;
+      border: 1px solid #d4e8f0; border-top: none;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #7ab8d9; color: white;
+      padding: 14px 40px; margin-top: 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer span { font-size: 12px; opacity: 0.9; }
+
+    @media print {
+      body { background: white; }
+      .page { max-width: 100%; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="module-label">The International Musician</div>
+    <h1>Module 3: Showreel Production</h1>
+    <div class="subtitle">How to Become a Cruise Ship Musician — Lara Bruyelles</div>
+    <div class="date">Generated ${dateStr}</div>
+  </div>
+
+  <div class="timeline-section">
+    <div>
+      <div class="timeline-label">YOUR TIMELINE</div>
+      <div class="timeline-value">${timeline} months</div>
+    </div>
+    <div class="timeline-desc">
+      ${{ '1':'Aggressive — book venues immediately, film within the first 2 weeks.',
+          '2':'Focused — aim for 2–3 gigs in the first month.',
+          '3':'Balanced — book 3–4 gigs spread across your timeline.',
+          '6':'Comfortable — 4–6 performances gives you solid footage variety.',
+          '9':'Plenty of time — aim for 6+ gigs across different venues.',
+          '12':'Long horizon — first 6 months to gather footage, the rest to refine.' }[timeline] || ''}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Agency Non-Negotiables</div>
+    ${checklistRows(requirements)}
+  </div>
+
+  <div style="background: #fff5f5; margin: 16px 40px 0; border-radius: 10px; padding: 20px 24px; border: 1px solid #fecaca;">
+    <div style="font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: #b91c1c; margin-bottom: 12px;">🚫 Fatal Mistakes — avoid every one of these</div>
+    ${fatalMistakes.map(m => `
+      <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:7px; background:white; border:1px solid #fecaca; border-radius:6px; padding:9px 12px; font-size:13px; color:#374151; line-height:1.5;">
+        <div style="width:18px; height:18px; border-radius:4px; background:#ef4444; color:white; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; margin-top:1px;">✕</div>
+        <span>${m}</span>
+      </div>`).join('')}
+  </div>
+
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Song Styles Captured</div>
+    <div class="styles-grid">${checklistRows(styles)}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Scheduled Gigs</div>
+    ${gigsHTML}
+  </div>
+
+  ${targetNotes ? `
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Target Lines & Strategy</div>
+    <div class="notes-text">${targetNotes.replace(/\n/g, '<br>')}</div>
+  </div>` : ''}
+
+  ${diversityNotes ? `
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Style Diversity Notes</div>
+    <div class="notes-text">${diversityNotes.replace(/\n/g, '<br>')}</div>
+  </div>` : ''}
+
+  ${productionNotes ? `
+  <div class="section">
+    <div class="section-heading"><div class="dot"></div>Production Notes</div>
+    <div class="notes-text">${productionNotes.replace(/\n/g, '<br>')}</div>
+  </div>` : ''}
+
+  <div class="next-steps-header">
+    <h2>✓ Next Steps</h2>
+  </div>
+  <div class="next-steps-body">
+    ${checklistRows([
+      { checked: false, text: 'Add weekly tasks to your personal calendar' },
+      { checked: false, text: 'Book remaining performance venues' },
+      { checked: false, text: 'Set up filming equipment before each gig' },
+      { checked: false, text: 'Review footage within 48 hours of each performance' },
+      { checked: false, text: 'Edit final showreel to 3–5 minutes' },
+      { checked: false, text: 'Upload to YouTube and set to PUBLIC' },
+      { checked: false, text: 'Test your link and add it to your applications' }
+    ])}
+  </div>
+
+  <div class="footer">
+    <span>The International Musician · How to Become a Cruise Ship Musician · Lara Bruyelles</span>
+    <span>Module 3: Showreel Production</span>
+  </div>
+
+</div>
+<script>
+  // Auto-trigger print dialog
+  window.addEventListener('load', function() {
+    setTimeout(function() { window.print(); }, 600);
+  });
+</scr` + `ipt>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    showAutoSave();
+  }
+
+  // ── FINISH ────────────────────────────────────────────────
+  function finishModule() {
+    saveProgress();
+    window.location.href = 'https://course.theinternationalmusician.com/b-account';
+  }
+
+  // ── INIT ─────────────────────────────────────────────────
+  document.addEventListener('input', saveProgress);
+  document.addEventListener('change', saveProgress);
+
+  // Default 3 empty gigs
+  gigs = [{date:'',venue:''},{date:'',venue:''},{date:'',venue:''}];
+  renderGigs();
+  loadProgress();
+  updateTimeline();
+</script>
+</body>
+</html>
