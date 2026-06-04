@@ -785,17 +785,17 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div>
                         <label class="form-label">Total songs in your list:</label>
-                        <input type="number" id="totalSongsPace" min="0" value="0" onchange="recalculatePace()" placeholder="e.g. 60">
+                        <input type="number" id="totalSongsPace" min="0" value="0" oninput="recalculatePace()" placeholder="e.g. 60">
                     </div>
                     <div>
                         <label class="form-label">Songs you already know:</label>
-                        <input type="number" id="songsKnownPace" min="0" value="0" onchange="recalculatePace()" placeholder="e.g. 15">
+                        <input type="number" id="songsKnownPace" min="0" value="0" oninput="recalculatePace()" placeholder="e.g. 15">
                     </div>
                 </div>
                 <p style="font-size: 12px; color: var(--text-light); margin-bottom: 20px; margin-top: -8px;">If you uploaded your song list in the previous step, these are filled in automatically.</p>
 
                 <label class="form-label">Timeline (months):</label>
-                <input type="number" id="timelineInput" min="1" value="6" onchange="recalculatePace()">
+                <input type="number" id="timelineInput" min="1" placeholder="e.g. 6" oninput="recalculatePace()">
 
                 <div id="paceInfo" style="margin-top: 24px;">
                     <p style="font-size: 16px; margin-bottom: 12px; color: var(--text-medium);">You have <strong style="color: var(--primary); font-size: 18px;" id="totalWeeks">24</strong> weeks to learn <strong style="color: var(--primary); font-size: 18px;" id="songsToLearnInfo">0</strong> songs.</p>
@@ -1157,7 +1157,7 @@
                 } else if (songsPerWeek >= 15) {
                     recText.innerHTML = "This is an ambitious pace — totally doable if you're focused on this full-time. A little reminder: it helps a lot if you already know the songs, even just from hearing them. The more familiar they feel, the quicker it goes. Keep things simple — you don't need to perfect every song, just get comfortable with it.";
                 } else if (songsPerWeek >= 5) {
-                    recText.innerHTML = "This is a solid, realistic pace — especially if you have a job or other things going on alongside your preparation. A good tip: if you already know some of the songs on your list, even just vaguely, those will go much quicker. Prioritise the songs from the <strong>Top 20 list in Module 2</strong> first if you can.";
+                    recText.innerHTML = "This is a solid, realistic pace — especially if you have a job or other things going on alongside your preparation. A good tip: if you already know some of the songs on your list, even just vaguely, those will go much quicker.";
                 } else {
                     recText.innerHTML = "Just wanted to gently flag — at this pace, it'll take a while to build your full repertoire. That's completely fine if the timeline works for you! Just something to be aware of. And remember, the video earlier in this module is all about making the learning process as simple and quick as possible. When in doubt, start with the songs you already kind of know — they'll take a fraction of the time.";
                 }
