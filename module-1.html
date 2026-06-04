@@ -292,6 +292,28 @@
             color: var(--text-light);
         }
 
+        .slider-anchors {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-top: 10px;
+        }
+        .slider-anchor {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-light);
+            line-height: 1.4;
+            padding: 6px 4px;
+            background: var(--primary-lighter);
+            border-radius: 6px;
+        }
+        .slider-anchor strong {
+            display: block;
+            font-size: 12px;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
         /* Radar Chart */
         .chart-container {
             margin: 40px 0;
@@ -598,32 +620,33 @@
                     <span class="skill-name">Repertoire + Versatility</span>
                     <span class="skill-score" id="scoreRepertoire">5</span>
                 </div>
-                <p class="skill-description">
-                    How many songs can you perform confidently across multiple genres? (50+ songs = 8-10)
-                </p>
+                <p class="skill-description">How many songs can you perform confidently, and across how many genres?</p>
                 <div class="slider-container">
                     <input type="range" min="1" max="10" value="5" class="slider" id="sliderRepertoire" oninput="updateSkill('repertoire', this.value)">
-                    <div class="slider-labels">
-                        <span class="slider-label">1 - Very Limited</span>
-                        <span class="slider-label">10 - Extensive</span>
+                    <div class="slider-anchors">
+                        <div class="slider-anchor"><strong>2</strong>Under 40 songs, 1 genre</div>
+                        <div class="slider-anchor"><strong>4</strong>40–80 songs, 2–3 genres</div>
+                        <div class="slider-anchor"><strong>6</strong>80–150 songs, 3–4 genres</div>
+                        <div class="slider-anchor"><strong>8</strong>150–250 songs, 4–5 genres</div>
+                        <div class="slider-anchor"><strong>10</strong>250+ songs, 5–6 genres</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Vocal -->
             <div class="skill-item">
                 <div class="skill-header">
-                    <span class="skill-name">Vocal Ability</span>
+                    <span class="skill-name">Vocal Readiness</span>
                     <span class="skill-score" id="scoreVocal">5</span>
                 </div>
-                <p class="skill-description">
-                    Singing technique, tone quality, range, and control
-                </p>
+                <p class="skill-description">Stamina and confidence — can you hold a long set and own the room?</p>
                 <div class="slider-container">
                     <input type="range" min="1" max="10" value="5" class="slider" id="sliderVocal" oninput="updateSkill('vocal', this.value)">
-                    <div class="slider-labels">
-                        <span class="slider-label">1 - Beginner</span>
-                        <span class="slider-label">10 - Professional</span>
+                    <div class="slider-anchors">
+                        <div class="slider-anchor"><strong>2</strong>Tires after one song, strong nerves</div>
+                        <div class="slider-anchor"><strong>4</strong>Short sets manageable, confidence developing</div>
+                        <div class="slider-anchor"><strong>6</strong>Comfortable for an hour, nerves manageable</div>
+                        <div class="slider-anchor"><strong>8</strong>Strong stamina, confident for long sets</div>
+                        <div class="slider-anchor"><strong>10</strong>Hours on stage, fully confident</div>
                     </div>
                 </div>
             </div>
@@ -634,14 +657,15 @@
                     <span class="skill-name">Instrumental Technique</span>
                     <span class="skill-score" id="scoreInstrumental">5</span>
                 </div>
-                <p class="skill-description">
-                    Technical proficiency on your primary instrument
-                </p>
+                <p class="skill-description">Technical proficiency on your primary instrument</p>
                 <div class="slider-container">
                     <input type="range" min="1" max="10" value="5" class="slider" id="sliderInstrumental" oninput="updateSkill('instrumental', this.value)">
-                    <div class="slider-labels">
-                        <span class="slider-label">1 - Basic</span>
-                        <span class="slider-label">10 - Expert</span>
+                    <div class="slider-anchors">
+                        <div class="slider-anchor"><strong>2</strong>Basic chords only (strumming / one chord at a time)</div>
+                        <div class="slider-anchor"><strong>4</strong>Simple patterns, limited styles</div>
+                        <div class="slider-anchor"><strong>6</strong>Comfortable self-accompanying, some variation</div>
+                        <div class="slider-anchor"><strong>8</strong>Varied patterns, confident across styles</div>
+                        <div class="slider-anchor"><strong>10</strong>Inversions, improvisation, solos — fully expressive</div>
                     </div>
                 </div>
             </div>
@@ -652,14 +676,15 @@
                     <span class="skill-name">Performance Experience</span>
                     <span class="skill-score" id="scorePerformance">5</span>
                 </div>
-                <p class="skill-description">
-                    Live performance confidence and stage presence
-                </p>
+                <p class="skill-description">Live performance experience across different environments</p>
                 <div class="slider-container">
                     <input type="range" min="1" max="10" value="5" class="slider" id="sliderPerformance" oninput="updateSkill('performance', this.value)">
-                    <div class="slider-labels">
-                        <span class="slider-label">1 - Rarely Performed</span>
-                        <span class="slider-label">10 - Extensive Experience</span>
+                    <div class="slider-anchors">
+                        <div class="slider-anchor"><strong>2</strong>Never played live</div>
+                        <div class="slider-anchor"><strong>4</strong>A few open mics or small events</div>
+                        <div class="slider-anchor"><strong>6</strong>Regular gigging, comfortable on stage</div>
+                        <div class="slider-anchor"><strong>8</strong>Varied venues and audiences</div>
+                        <div class="slider-anchor"><strong>10</strong>Years of experience in different environments</div>
                     </div>
                 </div>
             </div>
@@ -802,7 +827,7 @@
         <select id="bottleneckSelect" style="display:none" onchange="handleBottleneckChange()">
             <option value="">-- Select --</option>
             <option value="repertoire">Repertoire + Versatility</option>
-            <option value="vocal">Vocal Ability</option>
+            <option value="vocal">Vocal Readiness</option>
             <option value="instrumental">Instrumental Technique</option>
             <option value="performance">Performance Experience</option>
         </select>
@@ -821,7 +846,7 @@
                 <div id="bottleneckEditRow" style="display:none; margin-top: 12px;">
                     <select id="bottleneckSelectVisible" onchange="updateBottleneckFromVisible()" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:14px;">
                         <option value="repertoire">Repertoire + Versatility</option>
-                        <option value="vocal">Vocal Ability</option>
+                        <option value="vocal">Vocal Readiness</option>
                         <option value="instrumental">Instrumental Technique</option>
                         <option value="performance">Performance Experience</option>
                     </select>
@@ -1293,7 +1318,7 @@
         // Generate summary
         function generateSummary() {
             const bottleneck = selectedBottleneck;
-            const bottleneckNames = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const bottleneckNames = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Readiness', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
             const bottleneckName = bottleneckNames[bottleneck] || 'Unknown';
             const bottleneckScore = skillRatings[bottleneck] || 5;
             const timeline = selectedTimeline || 'Not set';
@@ -1671,7 +1696,7 @@
                 performance: skillRatings['performance'] || 5
             };
             const lowest = Object.entries(scores).sort((a, b) => a[1] - b[1])[0];
-            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Readiness', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
             
             const select = document.getElementById('bottleneckSelect');
             if (select) { select.value = lowest[0]; }
@@ -1694,7 +1719,7 @@
             selectedBottleneck = val;
             const select = document.getElementById('bottleneckSelect');
             if (select) select.value = val;
-            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const names = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Readiness', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
             const score = skillRatings[val] || 5;
             document.getElementById('bottleneckDisplayText').textContent = names[val] + ' (' + score + '/10)';
             saveProgress();
@@ -1712,7 +1737,7 @@
             // Collect all data from DOM first
             const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             const bottleneck = selectedBottleneck;
-            const bottleneckNames = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Ability', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
+            const bottleneckNames = { repertoire: 'Repertoire + Versatility', vocal: 'Vocal Readiness', instrumental: 'Instrumental Technique', performance: 'Performance Experience' };
             const bottleneckName = bottleneckNames[bottleneck] || '—';
             const timeline = selectedTimeline || 'Not set';
             const yourWhy = (document.getElementById('yourWhy')?.value || '').replace(/\n/g, '<br>');
