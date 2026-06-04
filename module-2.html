@@ -698,7 +698,7 @@
         <!-- SECTION 0: UPLOAD -->
         <div class="section-card" id="section1">
             <h2 class="section-title">Upload Your Master Song List</h2>
-            <p class="section-subtitle">Mark the songs you want to learn with an X in the checkbox column, then upload your file.</p>
+            <p class="section-subtitle">Mark the songs you want to learn with an <strong>X</strong> in column E, and songs you already know with an <strong>O</strong> in column F — then upload your file below.</p>
 
             <!-- LOOM VIDEO: How to use the Master Song List -->
             <div style="margin-bottom: 28px;">
@@ -714,7 +714,7 @@
                     <li><strong>Open the Master Song List</strong> → <a href="https://docs.google.com/spreadsheets/d/1Rd-2UXecWpl2IeZsFuhtJIVd6zQeuM7i/edit?usp=sharing&ouid=105222543999188564788&rtpof=true&sd=true" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: underline;">Click here to access it ↗</a></li>
                     <li><strong>Make your own copy</strong> — File → Make a copy (so you can edit it)</li>
                     <li><strong>Mark songs you want to learn</strong> — write an <strong>X</strong> in <strong>column E</strong> on any tab (this is the same on all three tabs)</li>
-                    <li><strong>Mark songs you already know</strong> — write an <strong>O</strong> in <strong>column F</strong> next to any song you can already perform (same column on all tabs). These will be automatically pre-checked in your learning checklist.</li>
+                    <li><strong>Mark songs you already know</strong> — write an <strong>O</strong> (or a <strong>0</strong>) in <strong>column F</strong> next to any song you can already perform (same column on all tabs). These will be automatically pre-checked in your learning checklist.</li>
                     <li><strong>Download as Excel</strong> — File → Download → Microsoft Excel (.xlsx)</li>
                     <li><strong>Upload it below</strong> ↓</li>
                 </ol>
@@ -1018,24 +1018,65 @@
                         const sheet = workbook.Sheets[sheetName];
                         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                         
+                        // Detect select/learned columns from header row
+                        let sheetSelectCol = -1, sheetLearnedCol = -1;
+                        if (rows[0]) {
+                            rows[0].forEach((cell, ci) => {
+                                const h = String(cell || '').trim().toLowerCase();
+                                if (h.includes('select') || h.includes('to learn') || h === 'x') sheetSelectCol = ci;
+                                if (h.includes('learn') || h.includes('know') || h === 'o') sheetLearnedCol = ci;
+                            });
+                        }
+                        console.log(`Sheet: "${sheetName}" → header-detected selectCol=${sheetSelectCol}, learnedCol=${sheetLearnedCol}`);
+                        
                         rows.forEach((row, idx) => {
                             if (idx === 0 || !row || row.length === 0) return;
 
-                            // Unified structure: A=Artist, B=Song, C=Year, E=Select(X), F=Learned(O)
-                            const artist   = String(row[0] || '').trim();
-                            const songName = String(row[1] || '').trim();
-                            const year     = String(row[2] || '').trim();
-                            const selectVal  = String(row[4] || '').trim().toUpperCase();
-                            const learnedVal = String(row[5] || '').trim().toUpperCase();
+                            // Find X: use header-detected column first, then scan columns 3–7
+                            let foundSelectCol = -1;
+                            if (sheetSelectCol >= 0) {
+                                const v = String(row[sheetSelectCol] || '').trim().toUpperCase();
+                                if (v === 'X' || v === 'TRUE') foundSelectCol = sheetSelectCol;
+                            }
+                            if (foundSelectCol < 0) {
+                                for (let ci = 3; ci <= 7; ci++) {
+                                    const v = String(row[ci] || '').trim().toUpperCase();
+                                    if (v === 'X' || v === 'TRUE') { foundSelectCol = ci; break; }
+                                }
+                            }
 
-                            const isSelected = selectVal === 'X' || selectVal === 'TRUE';
-                            const isLearned  = learnedVal === 'O' || learnedVal === 'TRUE';
+                            const isSelected = foundSelectCol >= 0;
+                            if (!isSelected) return;
 
-                            if (!songName || !isSelected) return;
+                            // Read artist/song/year relative to X column — works regardless of blank leading columns
+                            const artist   = String(row[foundSelectCol - 3] || '').trim();
+                            const songName = String(row[foundSelectCol - 2] || '').trim();
+                            const year     = String(row[foundSelectCol - 1] || '').trim();
 
-                            // Deduplicate across sheets
+                            if (!songName) return;
+
+                            // Find O: use header-detected column, or scan next 3 columns after X
+                            let isLearned = false;
+                            const learnedSearchStart = sheetLearnedCol >= 0 ? sheetLearnedCol : foundSelectCol + 1;
+                            for (let li = learnedSearchStart; li <= learnedSearchStart + 2; li++) {
+                                const lv = String(row[li] || '').trim().toUpperCase();
+                                if (lv === 'O' || lv === '0' || lv === 'TRUE') { isLearned = true; break; }
+                            }
+
+                            console.log(`  "${songName}" | select=col${foundSelectCol} | learned=${isLearned}`);
+
+                            // Deduplicate across sheets — but merge learned status
                             const key = (songName + '|' + artist).toLowerCase();
-                            if (seen.has(key)) return;
+                            if (seen.has(key)) {
+                                // Song already added — if this occurrence is learned, update it
+                                if (isLearned) {
+                                    const existing = appData.selectedSongs.find(s =>
+                                        (s.name + '|' + s.artist).toLowerCase() === key
+                                    );
+                                    if (existing) existing.learned = true;
+                                }
+                                return;
+                            }
                             seen.add(key);
 
                             appData.selectedSongs.push({
@@ -1180,6 +1221,15 @@
         function renderChecklist() {
             const container = document.getElementById('checklistContainer');
             container.innerHTML = '';
+
+            const total = appData.selectedSongs.length;
+            const learned = appData.selectedSongs.filter(s => s.learned).length;
+
+            // Counter bar at top
+            const counter = document.createElement('div');
+            counter.style.cssText = 'grid-column: 1 / -1; font-size: 13px; color: var(--text-medium); padding: 4px 0 8px 0;';
+            counter.innerHTML = `Showing all <strong>${total} songs</strong> — ${learned} pre-marked as learned, ${total - learned} to learn`;
+            container.appendChild(counter);
             
             // Group by era
             const eraOrder = ['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s','Other'];
