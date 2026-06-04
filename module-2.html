@@ -704,7 +704,7 @@
             <div style="margin-bottom: 28px;">
                 <p style="font-size: 14px; font-weight: 600; color: var(--text-medium); margin-bottom: 12px;">🎥 Watch this first — I'll walk you through the whole process:</p>
                 <div class="video-container">
-                    <iframe src="https://www.loom.com/embed/83d2c669098743c894c69f2c9e9202fa" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                    <iframe src="https://www.loom.com/embed/a61b656714f046aba007be383b637c50" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
                 </div>
             </div>
 
@@ -1016,6 +1016,7 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     
                     appData.selectedSongs = [];
+                    const seen = new Set();
                     
                     workbook.SheetNames.forEach(sheetName => {
                         if (sheetName.toLowerCase().includes('instruction')) return;
@@ -1023,61 +1024,57 @@
                         const sheet = workbook.Sheets[sheetName];
                         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                         
-                        let checkColumn = 3;
-                        if (sheetName.toLowerCase().includes('piano') || sheetName.toLowerCase().includes('guitar')) {
-                            checkColumn = 6;
-                        }
-                        
-                        console.log(`Sheet: ${sheetName}, checking column ${checkColumn}`);
-                        
                         rows.forEach((row, idx) => {
                             if (idx === 0 || !row || row.length === 0) return;
-                            
-                            const checkValue = String(row[checkColumn] || '').trim().toUpperCase();
-                            const hasX = checkValue === 'X' || checkValue === 'TRUE';
-                            
-                            if (!hasX) return;
-                            
-                            let songName = '';
-                            let artist = '';
-                            let era = '';
-                            const isUniversalOrCry = sheetName.toLowerCase().includes('universal') || sheetName.toLowerCase().includes('cry') || sheetName.toLowerCase().includes('pleasers') || sheetName.toLowerCase().includes('sing');
-                            const isPianoOrGuitar = sheetName.toLowerCase().includes('piano') || sheetName.toLowerCase().includes('guitar');
 
-                            if (isUniversalOrCry) {
-                                songName = String(row[0] || '').trim();
-                                artist   = String(row[1] || '').trim();
-                                era      = yearToDecade(row[2]);
-                            } else if (isPianoOrGuitar) {
-                                artist   = String(row[1] || '').trim();
-                                songName = String(row[2] || '').trim();
-                                era      = yearToDecade(row[3]);
-                            } else {
-                                songName = String(row[0] || '').trim();
-                                artist   = String(row[1] || '').trim();
-                                era      = yearToDecade(row[2]);
-                            }
-                            
-                            if (songName) {
-                                appData.selectedSongs.push({ name: songName, artist: artist, era: era || 'Other', genre: sheetName, id: Math.random() });
-                                console.log(`Added: ${songName} by ${artist}`);
-                            }
+                            // Unified structure: A=Artist, B=Song, C=Year, E=Select(X), F=Learned(O)
+                            const artist   = String(row[0] || '').trim();
+                            const songName = String(row[1] || '').trim();
+                            const year     = String(row[2] || '').trim();
+                            const selectVal  = String(row[4] || '').trim().toUpperCase();
+                            const learnedVal = String(row[5] || '').trim().toUpperCase();
+
+                            const isSelected = selectVal === 'X' || selectVal === 'TRUE';
+                            const isLearned  = learnedVal === 'O' || learnedVal === 'TRUE';
+
+                            if (!songName || !isSelected) return;
+
+                            // Deduplicate across sheets
+                            const key = (songName + '|' + artist).toLowerCase();
+                            if (seen.has(key)) return;
+                            seen.add(key);
+
+                            appData.selectedSongs.push({
+                                name: songName,
+                                artist: artist,
+                                era: yearToDecade(year) || 'Other',
+                                genre: sheetName,
+                                learned: isLearned,
+                                id: Math.random()
+                            });
                         });
                     });
                     
                     if (appData.selectedSongs.length === 0) {
-                        status.textContent = '❌ No songs found. Make sure they are marked with X in the correct column';
+                        status.textContent = '❌ No songs found. Make sure they are marked with X in column E';
                         status.className = 'status error';
                         return;
                     }
+
+                    // Auto-detect learned songs → pre-check in checklist
+                    const learnedCount = appData.selectedSongs.filter(s => s.learned).length;
+                    appData.completedSongs = appData.selectedSongs
+                        .filter(s => s.learned)
+                        .map(s => s.id);
+                    appData.songsKnown = learnedCount;
                     
-                    status.textContent = '✓ File processed!';
+                    status.textContent = `✓ ${appData.selectedSongs.length} songs loaded — ${learnedCount} already marked as learned`;
                     status.className = 'status success';
                     
                     document.getElementById('totalSongsEdit').value = appData.selectedSongs.length;
-                    document.getElementById('songsKnownEdit').value = appData.songsKnown || 0;
+                    document.getElementById('songsKnownEdit').value = learnedCount;
                     document.getElementById('totalSongsPace').value = appData.selectedSongs.length;
-                    document.getElementById('songsKnownPace').value = appData.songsKnown || 0;
+                    document.getElementById('songsKnownPace').value = learnedCount;
                     updateSongsToLearn();
                     document.getElementById('summarySection').style.display = 'block';
                     
@@ -1190,18 +1187,29 @@
             const container = document.getElementById('checklistContainer');
             container.innerHTML = '';
             
-            const genres = {};
+            // Group by era
+            const eraOrder = ['20s','30s','40s','50s','60s','70s','80s','90s','2000s','2010s','2020s','Other'];
+            const eras = {};
             appData.selectedSongs.forEach(song => {
-                if (!genres[song.genre]) genres[song.genre] = [];
-                genres[song.genre].push(song);
+                const key = song.era || 'Other';
+                if (!eras[key]) eras[key] = [];
+                eras[key].push(song);
             });
-            
-            Object.keys(genres).sort().forEach(genre => {
-                const genreDiv = document.createElement('div');
-                genreDiv.className = 'genre-section';
-                genreDiv.innerHTML = `<div class="genre-title">${genre}</div>`;
+
+            const sortedEras = Object.keys(eras).sort((a, b) => {
+                const ai = eraOrder.findIndex(e => a.toLowerCase().includes(e.toLowerCase()));
+                const bi = eraOrder.findIndex(e => b.toLowerCase().includes(e.toLowerCase()));
+                if (ai < 0 && bi < 0) return a.localeCompare(b);
+                if (ai < 0) return 1; if (bi < 0) return -1;
+                return ai - bi;
+            });
+
+            sortedEras.forEach(era => {
+                const eraDiv = document.createElement('div');
+                eraDiv.className = 'genre-section';
+                eraDiv.innerHTML = `<div class="genre-title">${era}</div>`;
                 
-                genres[genre].forEach(song => {
+                eras[era].forEach(song => {
                     const isCompleted = appData.completedSongs.includes(song.id);
                     const songDiv = document.createElement('div');
                     songDiv.className = 'song-item';
@@ -1211,11 +1219,12 @@
                             <div class="song-name">${song.name}</div>
                             <div class="song-artist">${song.artist}</div>
                         </div>
+                        ${song.learned ? '<span style="font-size:11px;color:var(--primary);font-weight:600;margin-left:auto;flex-shrink:0;">✓ known</span>' : ''}
                     `;
-                    genreDiv.appendChild(songDiv);
+                    eraDiv.appendChild(songDiv);
                 });
                 
-                container.appendChild(genreDiv);
+                container.appendChild(eraDiv);
             });
             
             updateProgress();
