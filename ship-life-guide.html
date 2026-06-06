@@ -4,107 +4,789 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ship Life: The Complete Guide — The International Musician</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--primary:#7ab8d9;--primary-light:#d4e8f0;--primary-lighter:#f0f7fa;--text-dark:#2c3e50;--text-medium:#4b5563;--text-light:#6b7280;--background:#f8f9fa;--white:#ffffff;--border:#e5e7eb;}
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--background);color:var(--text-dark);line-height:1.6;}
-        .container{max-width:800px;margin:0 auto;padding:40px 20px;}
-        .header{text-align:center;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid var(--primary-light);}
-        .header h1{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:600;color:var(--text-dark);margin-bottom:8px;}
-        .header p{font-size:14px;color:var(--text-light);font-weight:300;}
-        .progress-container{background:var(--white);padding:20px 24px;border-radius:12px;margin-bottom:32px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
-        .progress-steps{display:flex;justify-content:space-between;position:relative;margin-bottom:4px;}
-        .progress-line{position:absolute;top:16px;left:0;right:0;height:2px;background:var(--border);z-index:0;}
-        .progress-line-active{position:absolute;top:16px;left:0;height:2px;background:var(--primary);z-index:1;transition:width 0.3s ease;width:0%;}
-        .progress-step{text-align:center;flex:1;position:relative;z-index:2;cursor:pointer;}
-        .progress-circle{width:32px;height:32px;border-radius:50%;background:var(--white);border:2px solid var(--border);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--text-light);transition:all 0.3s ease;}
-        .progress-step:hover .progress-circle{border-color:var(--primary);transform:scale(1.1);}
-        .progress-step.active .progress-circle,.progress-step.completed .progress-circle{background:var(--primary);border-color:var(--primary);color:var(--white);}
-        .progress-label{font-size:12px;color:var(--text-light);font-weight:500;line-height:1.2;}
-        .progress-step.active .progress-label{color:var(--primary);font-weight:600;}
-        .section-card{background:var(--white);padding:40px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:none;}
-        .section-card.active{display:block;animation:fadeIn 0.3s ease;}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-        .section-title{font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:600;color:var(--text-dark);margin-bottom:12px;}
-        .section-subtitle{font-size:15px;color:var(--text-medium);margin-bottom:32px;line-height:1.6;}
-        .divider{height:1px;background:var(--border);margin:28px 0;}
-        .subsection-title{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:600;color:var(--text-dark);margin-bottom:16px;display:flex;align-items:center;}
-        .subsection-title::before{content:'';display:inline-block;width:4px;height:20px;background:var(--primary);border-radius:2px;margin-right:10px;}
-        .highlight-box{background:var(--primary-light);padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid var(--primary);}
-        .highlight-box h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;margin-bottom:10px;color:var(--text-dark);font-weight:600;}
-        .highlight-box p{color:var(--text-medium);font-size:14px;margin-bottom:7px;line-height:1.6;}
-        .highlight-box strong{color:var(--text-dark);font-weight:600;}
-        .light-box{background:var(--primary-lighter);padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid var(--primary);}
-        .light-box h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;margin-bottom:10px;color:var(--text-dark);font-weight:600;}
-        .light-box p{color:var(--text-medium);font-size:14px;margin-bottom:7px;line-height:1.6;}
-        .light-box strong{color:var(--text-dark);font-weight:600;}
-        .red-box{background:#fff0f0;padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid #e74c3c;}
-        .red-box h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;margin-bottom:10px;color:#c0392b;font-weight:600;}
-        .red-box p{color:var(--text-medium);font-size:14px;margin-bottom:8px;line-height:1.6;}
-        .red-box strong{color:#c0392b;font-weight:600;}
-        .green-box{background:#f0fff4;padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid #27ae60;}
-        .green-box h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;margin-bottom:10px;color:#1e8449;font-weight:600;}
-        .green-box p{color:var(--text-medium);font-size:14px;margin-bottom:7px;line-height:1.6;}
-        .green-box strong{color:#1e8449;font-weight:600;}
-        .yellow-box{background:#fffbeb;padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid #f59e0b;}
-        .yellow-box h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;margin-bottom:10px;color:#92400e;font-weight:600;}
-        .yellow-box p{color:var(--text-medium);font-size:14px;margin-bottom:7px;line-height:1.6;}
-        .yellow-box strong{color:#92400e;font-weight:600;}
-        .position-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-        .position-card{background:var(--primary-lighter);border-radius:8px;padding:16px;border:1px solid var(--primary-light);}
-        .position-card h4{font-family:'Playfair Display',Georgia,serif;font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:10px;}
-        .position-detail{display:flex;align-items:flex-start;font-size:12px;color:var(--text-medium);margin-bottom:5px;gap:6px;}
-        .position-detail span:first-child{color:var(--primary);font-weight:600;flex-shrink:0;min-width:64px;}
-        .checklist-item{display:flex;align-items:flex-start;margin-bottom:14px;padding:10px 0;border-bottom:1px solid var(--border);}
-        .checklist-item:last-of-type{border-bottom:none;}
-        .checklist-item input[type="checkbox"]{width:18px;height:18px;margin-right:12px;margin-top:3px;cursor:pointer;accent-color:var(--primary);flex-shrink:0;}
-        .checklist-item label{cursor:pointer;color:var(--text-dark);font-size:14px;font-weight:500;}
-        .checklist-item p{color:var(--text-light);font-size:12px;margin-top:4px;margin-left:30px;}
-        .salary-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}
-        .salary-table th{background:var(--primary-light);color:var(--text-dark);padding:10px 14px;text-align:left;font-weight:600;font-size:12px;}
-        .salary-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-medium);}
-        .salary-table tr:last-child td{border-bottom:none;}
-        .salary-table tr:hover td{background:var(--primary-lighter);}
-        .line-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
-        .line-card h4{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:600;color:var(--text-dark);margin-bottom:8px;}
-        .line-card p{font-size:13px;color:var(--text-medium);line-height:1.6;margin-bottom:6px;}
-        .line-card .tag{display:inline-block;background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-right:6px;margin-bottom:6px;}
-        .prompt-box{background:#1e2d3d;border-radius:8px;padding:20px;margin:20px 0;font-size:13px;color:#a8d8ea;line-height:1.8;white-space:pre-wrap;}
-        .prompt-label{color:#7ab8d9;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:block;font-family:'Inter',sans-serif;}
-        .prompt-copy{display:block;margin-top:16px;background:var(--primary);color:var(--white);border:none;padding:10px 20px;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.3s ease;}
-        .prompt-copy:hover{background:#6aa7c8;}
-        .quote{border-left:3px solid var(--primary);padding:12px 16px;margin:16px 0;background:var(--primary-lighter);border-radius:0 6px 6px 0;}
-        .quote p{color:var(--text-medium);font-size:14px;font-style:italic;}
-        .quote cite{font-size:12px;color:var(--text-light);font-style:normal;}
-        .pro-con-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-        .pro-box{background:#f0fff4;border-radius:8px;padding:16px;border-top:3px solid #27ae60;}
-        .pro-box h4{color:#1e8449;font-size:14px;font-weight:600;margin-bottom:10px;}
-        .con-box{background:#fff0f0;border-radius:8px;padding:16px;border-top:3px solid #e74c3c;}
-        .con-box h4{color:#c0392b;font-size:14px;font-weight:600;margin-bottom:10px;}
-        .pro-con-item{font-size:13px;color:var(--text-medium);margin-bottom:7px;padding-left:4px;}
-        .btn{flex:1;padding:14px 24px;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s ease;}
-        .btn-primary{background:var(--primary);color:var(--white);box-shadow:0 4px 12px rgba(122,184,217,0.3);}
-        .btn-primary:hover{background:#6aa7c8;transform:translateY(-2px);}
-        .btn-secondary{background:var(--white);color:var(--text-dark);border:2px solid var(--border);}
-        .btn-secondary:hover{border-color:var(--primary);color:var(--primary);}
-        .button-group{display:flex;gap:16px;margin-top:32px;}
-        .auto-save{position:fixed;bottom:20px;right:20px;background:var(--primary);color:var(--white);padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;opacity:0;transform:translateY(20px);transition:all 0.3s ease;box-shadow:0 4px 12px rgba(122,184,217,0.3);}
-        .auto-save.show{opacity:1;transform:translateY(0);}
-        @media(max-width:768px){.container{padding:20px 16px;}.header h1{font-size:26px;}.section-card{padding:24px;}.section-title{font-size:22px;}.button-group{flex-direction:column;}.position-grid{grid-template-columns:1fr;}.pro-con-grid{grid-template-columns:1fr;}}
-    
-    @media print {
-        .auto-save, .progress-container { display: none; }
-        .section-card { display: block !important; }
-        body::after { content: "The International Musician — Cruise Ship Musician Course"; display: block; text-align: center; font-size: 10px; color: #888; padding-top: 20px; }
-    }
-        .search-count {
-        padding: 8px 16px;
-        font-size: 12px;
-        color: var(--text-light);
-        border-bottom: 1px solid var(--border);
-        background: var(--primary-lighter);
-    }
+/* ============================================================
+   tim-shared.css — The International Musician
+   Shared styles for all course modules and guides
+   v1.0 — June 2026
+   ============================================================ */
+
+/* ---- Fonts ---- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ---- Design Tokens ---- */
+:root {
+  /* Brand */
+  --primary:         #7ab8d9;
+  --primary-light:   #d4e8f0;
+  --primary-lighter: #f0f7fa;
+
+  /* Text */
+  --text-dark:   #2c3e50;
+  --text-medium: #4b5563;
+  --text-light:  #6b7280;
+
+  /* Surface */
+  --background: #f8f9fa;
+  --white:       #ffffff;
+  --border:      #e5e7eb;
+
+  /* Warning (attention/callout boxes) */
+  --warning-bg:     #fff8ed;
+  --warning-border: #f0c060;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(122, 184, 217, 0.3);
+  --shadow-lg: 0 6px 16px rgba(122, 184, 217, 0.4);
+
+  /* Border radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---- Base ---- */
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--background);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* ---- Layout ---- */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* ---- Header ---- */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--primary-light);
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.header p {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 300;
+}
+
+/* ---- Progress Bar ---- */
+.progress-container {
+  background: var(--white);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.progress-line {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.progress-line-active {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  height: 2px;
+  background: var(--primary);
+  z-index: 1;
+  transition: width 0.3s ease;
+}
+
+.progress-step {
+  text-align: center;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.progress-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--border);
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  transition: all 0.3s ease;
+}
+
+.progress-step:hover .progress-circle {
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.progress-step.active .progress-circle,
+.progress-step.completed .progress-circle {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+}
+
+.progress-label {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.progress-step.active .progress-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ---- Section Cards ---- */
+.section-card {
+  background: var(--white);
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: none;
+}
+
+.section-card.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Typography ---- */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: var(--text-medium);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-light);
+  font-style: italic;
+  margin-top: 6px;
+}
+
+.sub-text {
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+/* ---- Buttons ---- */
+.button-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  background: #6aa7c8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--text-dark);
+  border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ---- Auto-save indicator ---- */
+.auto-save {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: var(--white);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.auto-save.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Utilities ---- */
+.hidden {
+  display: none !important;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .section-card {
+    padding: 24px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   Page-specific styles — Ship Life Guide
+   ============================================================ */
+
+/* ---- Divider ---- */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+
+/* ---- Subsection title with accent bar ---- */
+.subsection-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.subsection-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
+/* ---- Coloured content boxes ---- */
+.highlight-box {
+  background: var(--primary-light);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary);
+}
+
+.highlight-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.highlight-box p {
+  color: var(--text-medium);
+  font-size: 14px;
+  margin-bottom: 7px;
+  line-height: 1.6;
+}
+
+.highlight-box strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.light-box {
+  background: var(--primary-lighter);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary);
+}
+
+.light-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.light-box p {
+  color: var(--text-medium);
+  font-size: 14px;
+  margin-bottom: 7px;
+  line-height: 1.6;
+}
+
+.light-box strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.red-box {
+  background: #fff0f0;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border-left: 4px solid #e74c3c;
+}
+
+.red-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.red-box p {
+  color: var(--text-medium);
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.red-box strong {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.green-box {
+  background: #f0fff4;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border-left: 4px solid #27ae60;
+}
+
+.green-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #1e8449;
+  font-weight: 600;
+}
+
+.green-box p {
+  color: var(--text-medium);
+  font-size: 14px;
+  margin-bottom: 7px;
+  line-height: 1.6;
+}
+
+.green-box strong {
+  color: #1e8449;
+  font-weight: 600;
+}
+
+.yellow-box {
+  background: #fffbeb;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border-left: 4px solid #f59e0b;
+}
+
+.yellow-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #92400e;
+  font-weight: 600;
+}
+
+.yellow-box p {
+  color: var(--text-medium);
+  font-size: 14px;
+  margin-bottom: 7px;
+  line-height: 1.6;
+}
+
+.yellow-box strong {
+  color: #92400e;
+  font-weight: 600;
+}
+
+/* ---- Position grid ---- */
+.position-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.position-card {
+  background: var(--primary-lighter);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  border: 1px solid var(--primary-light);
+}
+
+.position-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.position-detail {
+  display: flex;
+  align-items: flex-start;
+  font-size: 12px;
+  color: var(--text-medium);
+  margin-bottom: 5px;
+  gap: 6px;
+}
+
+.position-detail span:first-child {
+  color: var(--primary);
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 64px;
+}
+
+/* ---- Checklist items ---- */
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.checklist-item:last-of-type {
+  border-bottom: none;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  margin-top: 3px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+
+.checklist-item label {
+  cursor: pointer;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.checklist-item p {
+  color: var(--text-light);
+  font-size: 12px;
+  margin-top: 4px;
+  margin-left: 30px;
+  width: 100%;
+}
+
+/* ---- Salary table ---- */
+.salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.salary-table th {
+  background: var(--primary-light);
+  color: var(--text-dark);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.salary-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-medium);
+}
+
+.salary-table tr:last-child td {
+  border-bottom: none;
+}
+
+.salary-table tr:hover td {
+  background: var(--primary-lighter);
+}
+
+/* ---- Line cards ---- */
+.line-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.line-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.line-card p {
+  font-size: 13px;
+  color: var(--text-medium);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.line-card .tag {
+  display: inline-block;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+/* ---- Prompt box ---- */
+.prompt-box {
+  background: #1e2d3d;
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin: 20px 0;
+  font-size: 13px;
+  color: #a8d8ea;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.prompt-label {
+  color: #7ab8d9;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  display: block;
+  font-family: 'Inter', sans-serif;
+}
+
+.prompt-copy {
+  display: block;
+  margin-top: 16px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.prompt-copy:hover {
+  background: #6aa7c8;
+}
+
+/* ---- Pull quote ---- */
+.quote {
+  border-left: 3px solid var(--primary);
+  padding: 12px 16px;
+  margin: 16px 0;
+  background: var(--primary-lighter);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.quote p {
+  color: var(--text-medium);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.quote cite {
+  font-size: 12px;
+  color: var(--text-light);
+  font-style: normal;
+}
+
+/* ---- Pro / Con grid ---- */
+.pro-con-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pro-box {
+  background: #f0fff4;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  border-top: 3px solid #27ae60;
+}
+
+.pro-box h4 {
+  color: #1e8449;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.con-box {
+  background: #fff0f0;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  border-top: 3px solid #e74c3c;
+}
+
+.con-box h4 {
+  color: #c0392b;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.pro-con-item {
+  font-size: 13px;
+  color: var(--text-medium);
+  margin-bottom: 7px;
+  padding-left: 4px;
+}
+
+/* ---- Search count indicator ---- */
+.search-count {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--text-light);
+  border-bottom: 1px solid var(--border);
+  background: var(--primary-lighter);
+}
+
+/* ---- Print ---- */
+@media print {
+  .auto-save,
+  .progress-container {
+    display: none;
+  }
+
+  .section-card {
+    display: block !important;
+  }
+
+  body::after {
+    content: "The International Musician — Cruise Ship Musician Course";
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: #888;
+    padding-top: 20px;
+  }
+}
+
+/* ---- Responsive (page-specific additions) ---- */
+@media (max-width: 768px) {
+  .position-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pro-con-grid {
+    grid-template-columns: 1fr;
+  }
+}
     </style>
 </head>
 <body>
