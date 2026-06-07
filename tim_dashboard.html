@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TIM Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --brand: #7AB8D9; --brand-dark: #5a9cbd; --bg: #0f1117; --surface: #181c25;
+    --border: #252a36; --text: #e8eaf0; --muted: #8892a4; --green: #5bbf8a;
+    --yt: #4A90D9; --fb: #7ab8d9; --email: #c792ea;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  .app { max-width: 740px; margin: 0 auto; padding: 32px 24px; }
+  .header { margin-bottom: 36px; }
+  .header-label { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--brand); margin-bottom: 8px; }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 1.2; }
+  .header-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 28px; background: var(--surface); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
+  .tab { flex: 1; padding: 10px 6px; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; border-radius: 7px; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--brand); color: #fff; }
+  .tab:hover:not(.active) { color: var(--text); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 24px; background: var(--brand); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+  .btn:hover { background: var(--brand-dark); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-sm { width: auto; padding: 8px 16px; font-size: 12px; border-radius: 6px; margin-bottom: 0; }
+  .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-cancel:hover { background: transparent; border-color: var(--brand); color: var(--brand); }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; width: 100%; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--brand); }
+  .input-group { margin-bottom: 14px; }
+  .input-hint { font-size: 11px; color: var(--muted); opacity: 0.7; margin-top: 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .context-note { font-size: 12px; color: var(--muted); line-height: 1.6; padding: 12px; background: rgba(122,184,217,0.06); border-left: 2px solid var(--brand); border-radius: 0 6px 6px 0; margin-bottom: 16px; }
+  .result-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-top: 16px; white-space: pre-wrap; font-size: 14px; line-height: 1.7; }
+  .result-box.error { border-color: #e05c5c; color: #e05c5c; }
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  /* Revenue */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .stat-big { font-family: 'DM Serif Display', serif; font-size: 40px; line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .progress-track { height: 6px; background: var(--border); border-radius: 10px; margin: 10px 0 6px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--brand); border-radius: 10px; transition: width 0.5s ease; }
+  .progress-fill.green { background: var(--green); }
+  .add-form { display: none; }
+  .add-form.open { display: block; }
+  .btn-row { display: flex; gap: 8px; }
+  .month-section { margin-bottom: 4px; }
+  .month-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 14px 0 8px; border-top: 1px solid var(--border); margin-top: 4px; }
+  .month-header:first-child { border-top: none; margin-top: 0; }
+  .month-total { color: var(--brand); }
+  .entry-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .entry-row:last-child { border-bottom: none; }
+  .entry-date { font-size: 11px; color: var(--muted); min-width: 70px; }
+  .entry-name { flex: 1; }
+  .entry-name-main { font-size: 14px; }
+  .entry-name-sub { font-size: 11px; color: var(--muted); }
+  .source-tag { font-size: 11px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+  .entry-amount { font-size: 15px; font-weight: 600; color: var(--green); min-width: 56px; text-align: right; }
+  .delete-btn { background: transparent; border: 1px solid #e05c5c33; color: #e05c5c; border-radius: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .delete-btn:hover { background: #e05c5c22; }
+  .empty-state { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+  .bottleneck-badge { display: inline-block; background: rgba(122,184,217,0.12); border: 1px solid rgba(122,184,217,0.3); color: var(--brand); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .source-breakdown { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .source-pill { font-size: 11px; padding: 2px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-label">The International Musician</div>
+    <div class="header-title">Business Dashboard</div>
+    <div class="header-sub">Weekly · Monthly · Revenue</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('revenue')">💰 Revenue</button>
+    <button class="tab" onclick="switchTab('weekly')">📊 Weekly</button>
+    <button class="tab" onclick="switchTab('monthly')">📅 Monthly</button>
+  </div>
+
+  <!-- REVENUE PANEL -->
+  <div id="panel-revenue" class="panel active">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">This month</div>
+        <div class="stat-big" id="this-month-total">€0</div>
+        <div class="progress-track"><div class="progress-fill" id="goal-bar" style="width:0%"></div></div>
+        <div class="stat-sub" id="goal-text">€0 of €1,500 goal</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">All time</div>
+        <div class="stat-big" id="all-time-total">€0</div>
+        <div class="stat-sub" id="entry-count">0 transactions</div>
+        <div class="source-breakdown" id="source-breakdown"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-sm" style="width:auto;margin-bottom:16px" onclick="toggleAddForm()">+ Add revenue</button>
+
+    <div class="add-form card" id="add-form">
+      <div class="card-title">New entry</div>
+      <div class="grid-2">
+        <div class="input-group"><label>Date</label><input type="date" id="new-date"/></div>
+        <div class="input-group"><label>Amount (€)</label><input type="number" id="new-amount" placeholder="197"/></div>
+      </div>
+      <div class="input-group"><label>Name / description</label><input type="text" id="new-name" placeholder="e.g. Gavin, Course sale"/></div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Type</label>
+          <select id="new-type">
+            <option>Course sale</option>
+            <option>Strategy session (€147)</option>
+            <option>Quick call (€47)</option>
+            <option>Gig</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Source</label>
+          <select id="new-source">
+            <option>YouTube</option>
+            <option>Facebook</option>
+            <option>Email</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="addEntry()">Save entry</button>
+        <button class="btn btn-sm btn-cancel" onclick="toggleAddForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="card" id="entries-container">
+      <div class="empty-state">Loading...</div>
+    </div>
+  </div>
+
+  <!-- WEEKLY PANEL -->
+  <div id="panel-weekly" class="panel">
+    <div class="context-note">Connects to vidIQ to pull your real analytics, identify your bottleneck, and suggest 5 titles for your next video.</div>
+    <button class="btn" id="weekly-btn" onclick="runWeekly()">▶ Run Sunday Review</button>
+    <div id="weekly-result"></div>
+  </div>
+
+  <!-- MONTHLY PANEL -->
+  <div id="panel-monthly" class="panel">
+    <div class="context-note">Fill in your numbers from YouTube Studio and ConvertKit. Run on the last Sunday of each month.</div>
+    <div class="card">
+      <div class="card-title">YouTube Studio</div>
+      <div class="input-group"><label>Month</label><input type="text" id="m-month" placeholder="e.g. June 2026"/></div>
+      <div class="grid-2">
+        <div class="input-group"><label>New subscribers</label><input type="number" id="m-new-subs" placeholder="0"/></div>
+        <div class="input-group"><label>Total subscribers</label><input type="number" id="m-total-subs" placeholder="1365"/></div>
+      </div>
+      <div class="input-group"><label>Total views this month</label><input type="number" id="m-views" placeholder="0"/></div>
+      <div class="grid-2">
+        <div class="input-group"><label>Best video title</label><input type="text" id="m-best-title" placeholder="Video title"/></div>
+        <div class="input-group"><label>Its views</label><input type="number" id="m-best-views" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">ConvertKit</div>
+      <div class="grid-2">
+        <div class="input-group"><label>New subscribers</label><input type="number" id="m-new-kit" placeholder="0"/></div>
+        <div class="input-group"><label>Total list size</label><input type="number" id="m-total-kit" placeholder="0"/></div>
+      </div>
+      <div class="grid-3">
+        <div class="input-group"><label>Opt-in rate %</label><input type="number" id="m-optin" placeholder="0"/><div class="input-hint">Landing page stats</div></div>
+        <div class="input-group"><label>Email open rate %</label><input type="number" id="m-open" placeholder="0"/></div>
+        <div class="input-group"><label>Click rate %</label><input type="number" id="m-click" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Revenue</div>
+      <div class="grid-2">
+        <div class="input-group"><label>Course sales (units)</label><input type="number" id="m-course" placeholder="0"/><div class="input-hint">× €197 each</div></div>
+        <div class="input-group"><label>Session revenue (€)</label><input type="number" id="m-sessions" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Anything else?</div>
+      <div class="input-group"><textarea id="m-notes" rows="3" placeholder="New platforms, big wins, unusual things..."></textarea></div>
+    </div>
+    <button class="btn" id="monthly-btn" onclick="runMonthly()">▶ Run Monthly Review</button>
+    <div id="monthly-result"></div>
+  </div>
+</div>
+
+<script>
+const GOAL = 1500;
+const SOURCE_COLORS = { YouTube: '#4A90D9', Facebook: '#7ab8d9', Email: '#c792ea', Other: '#8892a4' };
+const SEED = [
+  { id:1, date:'2026-04-21', name:'Rose', amount:147, source:'Facebook', type:'Strategy session (€147)' },
+  { id:2, date:'2026-05-12', name:'Lyric', amount:147, source:'YouTube', type:'Strategy session (€147)' },
+  { id:3, date:'2026-05-20', name:'Federica', amount:147, source:'YouTube', type:'Strategy session (€147)' },
+  { id:4, date:'2026-06-01', name:'Gavin', amount:47, source:'YouTube', type:'Quick call (€47)' },
+  { id:5, date:'2026-06-04', name:'Course sale', amount:197, source:'YouTube', type:'Course sale' },
+  { id:6, date:'2026-06-09', name:'Drake', amount:47, source:'YouTube', type:'Quick call (€47)' },
+];
+
+let entries = [];
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['revenue','weekly','monthly'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ── STORAGE ───────────────────────────────────────────────────────────────────
+async function loadEntries() {
+  try {
+    const res = await window.storage.get('revenue-entries');
+    if (res?.value) { entries = JSON.parse(res.value); }
+    else { entries = SEED; await window.storage.set('revenue-entries', JSON.stringify(SEED)); }
+  } catch(e) { entries = SEED; }
+  renderRevenue();
+}
+
+async function saveEntries() {
+  try { await window.storage.set('revenue-entries', JSON.stringify(entries)); } catch(e) {}
+}
+
+// ── REVENUE RENDER ─────────────────────────────────────────────────────────────
+function renderRevenue() {
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0,7);
+  const thisMonth = entries.filter(e => e.date.slice(0,7) === currentMonth);
+  const thisMonthTotal = thisMonth.reduce((s,e) => s+e.amount, 0);
+  const allTotal = entries.reduce((s,e) => s+e.amount, 0);
+  const pct = Math.min(100, (thisMonthTotal/GOAL)*100);
+
+  document.getElementById('this-month-total').textContent = '€'+thisMonthTotal;
+  document.getElementById('this-month-total').style.color = pct>=100 ? 'var(--green)' : 'var(--text)';
+  const bar = document.getElementById('goal-bar');
+  bar.style.width = pct+'%';
+  bar.className = 'progress-fill' + (pct>=100?' green':'');
+  document.getElementById('goal-text').textContent = '€'+thisMonthTotal+' of €'+GOAL+' goal ('+Math.round(pct)+'%)';
+  document.getElementById('all-time-total').textContent = '€'+allTotal;
+  document.getElementById('entry-count').textContent = entries.length+' transactions';
+
+  // Source breakdown
+  const srcDiv = document.getElementById('source-breakdown');
+  srcDiv.innerHTML = '';
+  ['YouTube','Facebook','Email','Other'].forEach(s => {
+    const t = entries.filter(e=>e.source===s).reduce((sum,e)=>sum+e.amount,0);
+    if (t>0) {
+      const span = document.createElement('span');
+      span.className = 'source-pill';
+      span.style.color = SOURCE_COLORS[s];
+      span.textContent = s+': €'+t;
+      srcDiv.appendChild(span);
+    }
+  });
+
+  // Group by month
+  const byMonth = {};
+  [...entries].sort((a,b)=>b.date.localeCompare(a.date)).forEach(e => {
+    const key = e.date.slice(0,7);
+    if (!byMonth[key]) byMonth[key] = [];
+    byMonth[key].push(e);
+  });
+
+  const container = document.getElementById('entries-container');
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty-state">No entries yet.</div>';
+    return;
+  }
+
+  let html = '';
+  Object.keys(byMonth).sort((a,b)=>b.localeCompare(a)).forEach((month, idx) => {
+    const mTotal = byMonth[month].reduce((s,e)=>s+e.amount,0);
+    const [y,m] = month.split('-');
+    const label = new Date(y,m-1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    html += `<div class="month-header${idx===0?' style="border-top:none;margin-top:0"':''}"><span>${label}</span><span class="month-total">€${mTotal}</span></div>`;
+    byMonth[month].forEach(entry => {
+      const d = new Date(entry.date);
+      const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      html += `<div class="entry-row">
+        <div class="entry-date">${dateStr}</div>
+        <div class="entry-name"><div class="entry-name-main">${entry.name}</div><div class="entry-name-sub">${entry.type||''}</div></div>
+        <span class="source-tag" style="color:${SOURCE_COLORS[entry.source]||'var(--muted)'}">${entry.source}</span>
+        <div class="entry-amount">€${entry.amount}</div>
+        <button class="delete-btn" onclick="deleteEntry(${entry.id})">✕</button>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+// ── ADD / DELETE ───────────────────────────────────────────────────────────────
+function toggleAddForm() {
+  const f = document.getElementById('add-form');
+  f.classList.toggle('open');
+  if (f.classList.contains('open')) {
+    document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+async function addEntry() {
+  const date = document.getElementById('new-date').value;
+  const name = document.getElementById('new-name').value.trim();
+  const amount = parseFloat(document.getElementById('new-amount').value);
+  const type = document.getElementById('new-type').value;
+  const source = document.getElementById('new-source').value;
+  if (!date || !name || !amount) return;
+  entries.push({ id: Date.now(), date, name, amount, source, type });
+  entries.sort((a,b)=>b.date.localeCompare(a.date));
+  await saveEntries();
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-amount').value = '';
+  document.getElementById('add-form').classList.remove('open');
+  renderRevenue();
+}
+
+async function deleteEntry(id) {
+  entries = entries.filter(e=>e.id!==id);
+  await saveEntries();
+  renderRevenue();
+}
+
+// ── WEEKLY ────────────────────────────────────────────────────────────────────
+const WEEKLY_SYSTEM = `You are a YouTube growth strategist for The International Musician, a channel by Lara — a pianist-vocalist with 4 years on cruise ships (8 contracts, 3 cruise lines). The channel helps musicians get hired on cruise ships. Subscribers: ~1,365. Offer: €197 course. Goal: Drive course sales through YouTube. Use vidIQ tools to pull recent analytics (CTR, view duration %, traffic sources) and respond with these exact headers:
+
+## METRICS SNAPSHOT
+## BOTTLENECK
+## WHY THIS MATTERS
+## 5 TITLE SUGGESTIONS FOR NEXT VIDEO
+
+For titles: number them 1-5, each with a dash and a one-line reason. Be direct, strategic, warm.`;
+
+async function runWeekly() {
+  const btn = document.getElementById('weekly-btn');
+  const result = document.getElementById('weekly-result');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Pulling your analytics...';
+  result.innerHTML = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: WEEKLY_SYSTEM,
+        messages: [{role:'user', content:'Run my weekly YouTube review. Use vidIQ to pull analytics, identify the bottleneck, and give me 5 title suggestions.'}],
+        mcp_servers: [{type:'url', url:'https://mcp.vidiq.com/mcp', name:'vidiq'}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('\n')||'';
+    if (!text) throw new Error('No response');
+    result.innerHTML = '<div class="result-box">'+formatWeekly(text)+'</div>';
+  } catch(e) {
+    result.innerHTML = '<div class="result-box error">⚠ '+e.message+'<br><small style="opacity:0.7;margin-top:6px;display:block">Check that vidIQ is connected.</small></div>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '▶ Run Sunday Review';
+}
+
+function formatWeekly(text) {
+  return text
+    .replace(/## METRICS SNAPSHOT/g, '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;margin:0 0 10px">Metrics snapshot</div>')
+    .replace(/## BOTTLENECK/g, '<div style="margin-top:16px"><span style="display:inline-block;background:rgba(122,184,217,0.12);border:1px solid rgba(122,184,217,0.3);color:var(--brand);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Bottleneck</span></div>')
+    .replace(/## WHY THIS MATTERS/g, '')
+    .replace(/## 5 TITLE SUGGESTIONS FOR NEXT VIDEO/g, '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0"/><div style="font-family:\'DM Serif Display\',serif;font-size:16px;margin-bottom:10px">Title suggestions</div>');
+}
+
+// ── MONTHLY ───────────────────────────────────────────────────────────────────
+const MONTHLY_SYSTEM = `You are a business analyst for The International Musician by Lara — cruise ship musician course (€197), YouTube-only acquisition, ConvertKit email list. Given monthly metrics, give a concise review with these exact headers:
+
+## MONTH AT A GLANCE
+## WHAT'S WORKING
+## THE BOTTLENECK
+## ONE FOCUS FOR NEXT MONTH
+
+Be honest, direct, specific.`;
+
+async function runMonthly() {
+  const btn = document.getElementById('monthly-btn');
+  const result = document.getElementById('monthly-result');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analysing your month...';
+  result.innerHTML = '';
+  const course = parseInt(document.getElementById('m-course').value)||0;
+  const sessions = parseInt(document.getElementById('m-sessions').value)||0;
+  const total = course*197 + sessions;
+  const prompt = `Monthly review for ${document.getElementById('m-month').value||'this month'}:
+YOUTUBE: New subs: ${document.getElementById('m-new-subs').value||'?'}, Total: ${document.getElementById('m-total-subs').value||'?'}, Views: ${document.getElementById('m-views').value||'?'}, Best: "${document.getElementById('m-best-title').value||'?'}" (${document.getElementById('m-best-views').value||'?'} views)
+EMAIL: New Kit subs: ${document.getElementById('m-new-kit').value||'?'}, Total list: ${document.getElementById('m-total-kit').value||'?'}, Opt-in: ${document.getElementById('m-optin').value||'?'}%, Open rate: ${document.getElementById('m-open').value||'?'}%, Click rate: ${document.getElementById('m-click').value||'?'}%
+REVENUE: Course: ${course} × €197, Sessions: €${sessions}, Total: €${total}
+Notes: ${document.getElementById('m-notes').value||'none'}`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:MONTHLY_SYSTEM, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('\n')||'';
+    if (!text) throw new Error('No response');
+    result.innerHTML = '<div class="result-box">'+text+'</div>';
+  } catch(e) {
+    result.innerHTML = '<div class="result-box error">⚠ '+e.message+'</div>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '▶ Run Monthly Review';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadEntries();
+</script>
+</body>
+</html>
