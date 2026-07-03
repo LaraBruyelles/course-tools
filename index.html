@@ -214,14 +214,30 @@
 
   @media (max-width: 760px) {
     .about-grid { grid-template-columns: 1fr; gap: 34px; }
-    .gallery { flex-direction: column; }
-    .gallery-col { flex-direction: row; flex-wrap: wrap; }
-    .gallery-col a { flex: 1 1 45%; }
+    .gallery {
+      display: flex; grid-template-columns: none;
+      overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      gap: 10px;
+    }
+    .gallery::-webkit-scrollbar { display: none; }
+    .gallery a { flex: 0 0 82%; scroll-snap-align: center; aspect-ratio: 4/5; }
+    .gallery-wrap { position: relative; }
+    .carousel-arrow {
+      display: flex; position: absolute; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; align-items: center; justify-content: center;
+      background: rgba(20,20,31,0.75); border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 50%; color: var(--gold); font-size: 1.1rem; cursor: pointer; z-index: 5;
+    }
+    .carousel-arrow.prev { left: -6px; }
+    .carousel-arrow.next { right: -6px; }
     section { padding: 76px 6vw; }
     .venue-list { gap: 34px; }
     .lang-switch { top: 14px; right: 14px; }
     .contact-card { padding: 28px 20px; }
   }
+
+  .carousel-arrow { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -291,18 +307,25 @@
 <section class="gallery-section" id="gallery">
   <div class="section-head">
     <p class="eyebrow" data-i18n="galleryEyebrow">Gallery</p>
-    <h2 data-i18n="galleryTitle">In Performance</h2>
+    <h2 data-i18n="galleryTitle">Gallery</h2>
   </div>
-  <div class="gallery">
+  <div class="gallery-wrap">
+    <button class="carousel-arrow prev" onclick="scrollGallery(-1)" aria-label="Previous">&#8249;</button>
+    <div class="gallery" id="gallery-track">
+    <a href="img/g_col3_2.jpg" target="_blank"><img src="img/g_col3_2.jpg" width="1120" height="1400" alt="Lara Bruyelles portrait"></a>
     <a href="img/g_col1_1.jpg" target="_blank"><img src="img/g_col1_1.jpg" width="933" height="1400" alt="Lara Bruyelles performing at a wedding"></a>
     <a href="img/g_col2_2.jpg" target="_blank"><img src="img/g_col2_2.jpg" width="853" height="1066" alt="Lara Bruyelles portrait"></a>
-    <a href="img/g_col3_1.jpg" target="_blank"><img src="img/g_col3_1.jpg" width="934" height="1400" alt="Lara Bruyelles portrait"></a>
-    <a href="img/g_col2_3.jpg" target="_blank"><img src="img/g_col2_3.jpg" width="1400" height="1120" style="object-position: 15% center;" alt="Lara Bruyelles at the piano, profile"></a>
-    <a href="img/g_col3_2.jpg" target="_blank"><img src="img/g_col3_2.jpg" width="1120" height="1400" alt="Lara Bruyelles portrait"></a>
-    <a href="img/g_col2_1.jpg" target="_blank"><img src="img/g_col2_1.jpg" width="933" height="1400" alt="Lara Bruyelles performing outdoors"></a>
+    <a href="img/g_col3_1.jpg" target="_blank"><img src="img/g_col3_1.jpg" width="954" height="1192" alt="Lara Bruyelles portrait"></a>
+    <a href="img/n1.jpg" target="_blank"><img src="img/n1.jpg" width="1400" height="931" style="object-position: 22% center;" alt="Lara Bruyelles at the piano"></a>
     <a href="img/g_col1_3.jpg" target="_blank"><img src="img/g_col1_3.jpg" width="1400" height="1120" alt="Lara Bruyelles, red gown"></a>
+    <a href="img/g_col2_3.jpg" target="_blank"><img src="img/g_col2_3.jpg" width="1400" height="1120" style="object-position: 15% center;" alt="Lara Bruyelles at the piano, profile"></a>
+    <a href="img/g_col2_1.jpg" target="_blank"><img src="img/g_col2_1.jpg" width="933" height="1400" alt="Lara Bruyelles performing outdoors"></a>
+    <a href="img/n2.jpg" target="_blank"><img src="img/n2.jpg" width="1400" height="788" alt="Lara Bruyelles performing"></a>
     <a href="img/g_col3_3.jpg" target="_blank"><img src="img/g_col3_3.jpg" width="718" height="575" style="object-position: 65% center;" alt="Lara Bruyelles at the white piano"></a>
     <a href="img/g_col1_2.jpg" target="_blank"><img src="img/g_col1_2.jpg" width="1120" height="1400" alt="Lara Bruyelles, close portrait"></a>
+    <a href="img/n3.jpg" target="_blank"><img src="img/n3.jpg" width="808" height="1038" alt="Lara Bruyelles portrait"></a>
+    </div>
+    <button class="carousel-arrow next" onclick="scrollGallery(1)" aria-label="Next">&#8250;</button>
   </div>
 </section>
 
@@ -374,6 +397,29 @@
 </footer>
 
 <script>
+  function scrollGallery(dir) {
+    const track = document.getElementById('gallery-track');
+    const card = track.querySelector('a');
+    if (!card) return;
+    track.scrollBy({ left: dir * card.offsetWidth, behavior: 'smooth' });
+  }
+
+  (function autoAdvanceGallery() {
+    if (window.innerWidth > 760) return;
+    const track = document.getElementById('gallery-track');
+    if (!track) return;
+    setInterval(() => {
+      const card = track.querySelector('a');
+      if (!card) return;
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
+      if (atEnd) {
+        track.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        track.scrollBy({ left: card.offsetWidth, behavior: 'smooth' });
+      }
+    }, 4000);
+  })();
+
   function switchReel(id, btn) {
     document.getElementById('reel-frame').src = 'https://www.youtube.com/embed/' + id;
     document.querySelectorAll('.reel-toggle button').forEach(b => b.classList.remove('active'));
@@ -419,7 +465,7 @@
       reelToggle1: "Elegant",
       reelToggle2: "Lively",
       galleryEyebrow: "Gallery",
-      galleryTitle: "In Performance",
+      galleryTitle: "Gallery",
       venuesEyebrow: "In Residence",
       bookingEyebrow: "Booking",
       bookingTitle: "Ready to play<br>for your event",
@@ -461,7 +507,7 @@
       reelToggle1: "Élégant",
       reelToggle2: "Festif",
       galleryEyebrow: "En images",
-      galleryTitle: "Sur scène",
+      galleryTitle: "Galerie",
       venuesEyebrow: "En résidence",
       bookingEyebrow: "Réservation",
       bookingTitle: "Prête à jouer<br>pour votre événement",
