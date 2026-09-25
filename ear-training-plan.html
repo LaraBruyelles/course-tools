@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Ear Training Plan &middot; The International Musician</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7ab8d9;
+    --primary-light: #d4e8f0;
+    --primary-lighter: #f0f7fa;
+    --text-dark: #2c3e50;
+    --text-medium: #4b5563;
+    --text-light: #6b7280;
+    --background: #f8f9fa;
+    --white: #ffffff;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--background);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 48px 20px 80px; }
+
+  .header { text-align: center; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 2px solid var(--primary-light); }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600; color: var(--text-dark); margin: 0 0 8px; }
+  .header p { font-size: 14px; color: var(--text-light); font-weight: 300; margin: 0; }
+
+  .intro {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--text-medium);
+    line-height: 1.6;
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto 32px;
+  }
+
+  .card {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  .score-card h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 18px; }
+  .score-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 14px; }
+  .score-row:last-child { margin-bottom: 0; }
+  .score-row label:first-child { width: 150px; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+  .score-row .field { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-light); }
+  .score-row input[type="date"], .score-row input[type="number"] {
+    font-family: 'Inter', sans-serif;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 14px;
+    color: var(--text-dark);
+  }
+  .score-row input[type="number"] { width: 60px; }
+  .score-row input:focus { outline: none; border-color: var(--primary); }
+
+  .retake-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .retake-link:hover { text-decoration: underline; }
+
+  .band { background: var(--primary-lighter); border-left: 4px solid var(--primary); border-radius: 0 12px 12px 0; padding: 22px 26px; margin-bottom: 20px; }
+  .band-title { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .band-range { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--text-dark); }
+  .band-name { font-size: 18px; font-weight: 600; color: var(--primary); }
+  .band-note { font-size: 13px; font-style: italic; color: var(--text-medium); margin: 0 0 12px; line-height: 1.5; }
+  .band ol { margin: 0; padding-left: 20px; color: var(--text-medium); font-size: 15px; line-height: 1.9; }
+  .band ol li strong { color: var(--text-dark); }
+
+  .tracker-card h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 4px; }
+  .tracker-card p.sub { font-size: 13px; color: var(--text-light); margin: 0 0 18px; }
+  .tracker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .day {
+    aspect-ratio: 1;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .day span { font-size: 11px; color: var(--text-light); }
+  .day:hover { border-color: var(--primary); }
+  .day.done { background: var(--primary); border-color: var(--primary); }
+  .day.done span { color: var(--white); }
+  .day.done::after { content: "\2713"; color: var(--white); font-size: 16px; font-weight: 700; }
+  .day:not(.done)::after { content: ""; }
+
+  .actions { display: flex; gap: 16px; justify-content: center; margin: 32px 0 8px; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+  }
+  .btn-primary { background: var(--primary); color: var(--white); box-shadow: 0 4px 12px rgba(122,184,217,0.3); }
+  .btn-primary:hover { background: #6aa7c8; }
+  .btn-secondary { background: var(--white); color: var(--text-dark); border: 2px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--primary-light); font-size: 13px; color: var(--text-light); }
+  .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+  .footer a:hover { text-decoration: underline; }
+
+  @media print {
+    body { background: var(--white); }
+    .actions, .footer .print-hide { display: none; }
+    .day.done::after { content: "\2713"; }
+  }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 30px; }
+    .card { padding: 20px; }
+    .tracker-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Your Ear Training Plan</h1>
+    <p>From the Piano Ear Test &middot; by Lara Bruyelles</p>
+  </div>
+
+  <p class="intro">Your ear is a skill, not something you're born with or without. This plan turns your score into two weeks of daily practice, five minutes a day, so what you started in the video keeps building after it ends.</p>
+
+  <div class="card score-card">
+    <h2>Track your score</h2>
+    <div class="score-row">
+      <label>First try</label>
+      <div class="field">Date: <input type="date"></div>
+      <div class="field">Score: <input type="number" min="0" max="15"> / 15</div>
+    </div>
+    <div class="score-row">
+      <label>Retake in 2 weeks</label>
+      <div class="field">Date: <input type="date"></div>
+      <div class="field">Score: <input type="number" min="0" max="15"> / 15</div>
+    </div>
+    <a class="retake-link" href="https://youtu.be/BvetCtbSn8o" target="_blank" rel="noopener">&#9654; Retake the test on YouTube</a>
+  </div>
+
+  <div class="band">
+    <div class="band-title"><span class="band-range">0&ndash;7</span><span class="band-name">Just Starting</span></div>
+    <p class="band-note">Guessing gets you about 6 or 7, so this isn't a bad score, it just means your ear hasn't been trained yet.</p>
+    <ol>
+      <li>Play one note, and sing it back.</li>
+      <li>Then play two notes, and say higher or lower.</li>
+      <li>Hum the first line of <strong>Happy Birthday</strong> or <strong>Twinkle Twinkle</strong> before you play it.</li>
+    </ol>
+  </div>
+
+  <div class="band">
+    <div class="band-title"><span class="band-range">8&ndash;11</span><span class="band-name">Waking Up</span></div>
+    <ol>
+      <li>Play the C major scale, and sing the numbers as you go.</li>
+      <li>Then play a random note, and name its number.</li>
+      <li>Hum a note before you play it, then check if you were right.</li>
+    </ol>
+  </div>
+
+  <div class="band">
+    <div class="band-title"><span class="band-range">12&ndash;15</span><span class="band-name">Ready to Play</span></div>
+    <ol>
+      <li>Pick an easy, well-known song, like <strong>Let It Be</strong> or a song from your own set.</li>
+      <li>Find the bass note of every chord in it.</li>
+      <li>Once a week, learn one new song by ear only, no chords looked up.</li>
+    </ol>
+  </div>
+
+  <div class="card tracker-card">
+    <h2>Two-week practice tracker</h2>
+    <p class="sub">Tap a day each time you practice, five minutes is enough. Your ticks are saved on this device.</p>
+    <div class="tracker-grid" id="trackerGrid"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="window.print()">&#128190; Save as PDF</button>
+    <a class="btn btn-primary" href="https://youtu.be/BvetCtbSn8o" target="_blank" rel="noopener">&#9654; Watch the Piano Ear Test</a>
+  </div>
+
+  <div class="footer">
+    <p>Lara Bruyelles &middot; <a href="https://youtube.com/@larabruyelles" target="_blank" rel="noopener">youtube.com/@larabruyelles</a></p>
+    <p class="print-hide">Come back to <a href="https://youtu.be/BvetCtbSn8o" target="_blank" rel="noopener">the video</a> in two weeks, retake the test, and see how far you've come.</p>
+  </div>
+
+</div>
+
+<script>
+  const grid = document.getElementById('trackerGrid');
+  const STORAGE_KEY = 'earTrainingTracker';
+  let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  if (state.length !== 14) state = new Array(14).fill(false);
+
+  function render() {
+    grid.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const day = document.createElement('div');
+      day.className = 'day' + (state[i] ? ' done' : '');
+      day.innerHTML = '<span>' + (i + 1) + '</span>';
+      day.addEventListener('click', () => {
+        state[i] = !state[i];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        render();
+      });
+      grid.appendChild(day);
+    }
+  }
+  render();
+</script>
+</body>
+</html>
