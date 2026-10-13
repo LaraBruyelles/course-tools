@@ -635,11 +635,16 @@ body {
             </div>
         </div>
 
-        <div class="yt-link">Not ready yet? <a href="https://youtube.com/@theinternationalmusician" target="_blank">Follow on YouTube</a> for weekly videos on the cruise ship musician world.</div>
+        <div class="yt-link" id="joinLink">Not ready yet? <a href="https://www.skool.com/backstage-with-lara-3994" target="_blank">Join Backstage with Lara</a>, my free community for performing musicians.</div>
 
         <div class="button-group" style="margin-top:28px;">
             <button class="btn btn-secondary" onclick="goToSection(3)">← Back</button>
             <button class="btn btn-primary" onclick="downloadSummary()">📥 Download My Summary</button>
+        </div>
+
+        <div id="skoolBack" style="display:block;margin-top:28px;text-align:center;">
+            <a href="https://www.skool.com/backstage-with-lara-3994/classroom" style="display:block;background:#2C3E50;color:#ffffff;font-family:'Inter',sans-serif;font-size:20px;font-weight:600;padding:22px 28px;border-radius:12px;text-decoration:none;box-shadow:0 6px 20px rgba(44,62,80,.35);">&larr; Go back to the classroom</a>
+            <p style="font-size:13px;color:#6b7b8a;margin-top:10px;font-family:'Inter',sans-serif;">Then post your result in the community post under the lesson.</p>
         </div>
     </div>
 
@@ -729,5 +734,13 @@ ${no.map(t => `<div class="cr nn"><div class="cb"></div>${t}</div>`).join('')}
         w.document.write(html);
         w.document.close();
     }
+</script>
+<script>
+(function(){
+  try {
+    var fromSkool = /[?&]from=skool/.test(location.search) || /skool\.com/.test(document.referrer || '');
+    if (fromSkool) { document.getElementById('joinLink').style.display = 'none'; }
+  } catch(e) {}
+})();
 </script>
 </body>
