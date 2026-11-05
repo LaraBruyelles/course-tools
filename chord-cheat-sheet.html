@@ -42,6 +42,12 @@
   .tip { background: var(--primary-lighter); border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 14px; color: var(--text-medium); margin-top: 10px; }
   .tip strong { color: var(--text-dark); }
 
+
+  .keys-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 4px; }
+  .keys-table th { text-align: center; padding: 8px 6px; font-size: 12px; color: var(--text-light); font-weight: 600; border-bottom: 2px solid var(--border); }
+  .keys-table td { text-align: center; padding: 10px 6px; border-bottom: 1px solid var(--border); color: var(--text-dark); font-weight: 600; }
+  .keys-table td.key { background: var(--primary-lighter); color: var(--primary); font-family: 'Playfair Display', serif; font-size: 16px; }
+  .keys-table tr:last-child td { border-bottom: none; }
   .songs-list { list-style: none; margin: 0; padding: 0; }
   .songs-list li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--text-medium); }
   .songs-list li:last-child { border-bottom: none; }
@@ -60,6 +66,16 @@
   .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
   .footer a:hover { text-decoration: underline; }
 
+
+  .premium { background: var(--white); border: 2px solid var(--primary); border-radius: 12px; padding: 22px 26px; margin-top: 8px; text-align: center; }
+  .premium p { margin: 0 0 14px; font-size: 15px; color: var(--text-medium); line-height: 1.6; }
+  .premium a.btn { display: inline-block; background: var(--primary); color: var(--white); padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; }
+  .premium a.btn:hover { background: #6aa7c8; }
+  .print-btn { display: block; margin: 0 auto 28px; background: var(--white); color: var(--text-dark); border: 2px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .print-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .chord-box { transition: transform .15s ease; }
+  .chord-box:hover { transform: translateY(-2px); }
+  @media print { .print-btn, .premium a.btn { display: none; } body { background: #fff; } }
   @media (max-width: 600px) {
     .header h1 { font-size: 30px; }
     .card { padding: 20px; }
@@ -77,6 +93,8 @@
 
   <p class="intro">You don't need a hundred chords to accompany yourself. You need four. These same four show up in more pop songs than you'd expect, because they all belong to one simple pattern.</p>
 
+  <button class="print-btn" onclick="window.print()">&#128190; Save as PDF or print</button>
+
   <div class="card">
     <h2>The four chords</h2>
     <p class="sub">Play them in this order and your hand already knows the shape of dozens of songs.</p>
@@ -89,6 +107,21 @@
     <div class="arrow-row"><span>C &rarr; A minor &rarr; F &rarr; G &rarr; back to C</span></div>
     <div class="tip"><strong>Too many notes?</strong> Play just the root and the fifth of each chord, the two outer notes in the "Simple" line above. It still sounds right, and it's an easier place to start.</div>
     <div class="tip"><strong>Left hand.</strong> Add one note in your left hand, the root of the chord you're playing, an octave lower, C then A then F then G. That's it, that's your bass line.</div>
+  </div>
+
+  <div class="card">
+    <h2>The same four chords in other keys</h2>
+    <p class="sub">If a song feels too high or too low for your voice, move the whole pattern to another key. The order never changes, only the starting note.</p>
+    <table class="keys-table">
+      <tr><th>Key</th><th>1st chord</th><th>2nd (minor)</th><th>3rd</th><th>4th</th></tr>
+      <tr><td class="key">C</td><td>C</td><td>Am</td><td>F</td><td>G</td></tr>
+      <tr><td class="key">G</td><td>G</td><td>Em</td><td>C</td><td>D</td></tr>
+      <tr><td class="key">D</td><td>D</td><td>Bm</td><td>G</td><td>A</td></tr>
+      <tr><td class="key">F</td><td>F</td><td>Dm</td><td>B&#9837;</td><td>C</td></tr>
+      <tr><td class="key">A</td><td>A</td><td>F&#9839;m</td><td>D</td><td>E</td></tr>
+      <tr><td class="key">E</td><td>E</td><td>C&#9839;m</td><td>A</td><td>B</td></tr>
+    </table>
+    <div class="tip"><strong>How to pick your key.</strong> Sing the first line of the song while you hold the first chord. If you strain for the high notes, try the next key down the list. If your voice feels stuck in the basement, try one up. Start in C, it uses only white keys.</div>
   </div>
 
   <div class="card">
@@ -112,7 +145,7 @@
       <div class="desc">Play the chord, then play it again, right hand only. A small amount of movement that already sounds more alive.</div>
     </div>
     <div class="pattern">
-      <div class="label">3. Root, fifth, root (the one Lara used on cruise ships)</div>
+      <div class="label">3. Root, fifth, root (the one I used on cruise ships)</div>
       <div class="desc">Left hand plays the root, then the fifth, then the root again on top, with a short rest before the next chord. This is the pattern under "I'm Yours." It takes more practice, so only move to it once pattern 1 feels easy.</div>
     </div>
   </div>
@@ -126,6 +159,11 @@
       <li><strong>Change the melody slightly</strong> so it fits over a chord you already know, rather than forcing a new one.</li>
       <li><strong>Learn the one new chord.</strong> Sometimes it's genuinely simple, D minor is the exact same shape as C major, just one note higher.</li>
     </ol>
+  </div>
+
+  <div class="premium">
+    <p><strong>Want songs to practise these on?</strong> Backstage Premium includes Build Your Repertoire, a library of 600+ songs with chords, plus a tool to learn them step by step.</p>
+    <a class="btn" href="https://www.skool.com/backstage-with-lara-3994" target="_blank" rel="noopener">See what's inside Backstage Premium</a>
   </div>
 
   <div class="footer">
